@@ -1,0 +1,4 @@
+videolar/
+venv/
+.env
+.DS_Store

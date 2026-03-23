@@ -1,0 +1,253 @@
+{
+  "total_topics": 13,
+  "last_updated": "2026-03-23",
+  "topics": [
+    {
+      "id": "present_simple",
+      "title": "Present Simple (Geniş Zaman)",
+      "level": "A1",
+      "explanation": "Geniş zaman, genel gerçekleri, alışkanlıkları ve rutinleri ifade etmek için kullanılır. Günlük hayatta en çok kullanılan zaman dilimidir.",
+      "rules": [
+        "Olumlu cümlelerde 'he, she, it' özneleri için fiile '-s' takısı gelir.",
+        "Soru ve olumsuz cümlelerde 'do' ve 'does' yardımcı fiilleri kullanılır.",
+        "Does kullanıldığında fiil yalın haline döner (takı düşer).",
+        "Zaman zarfları (always, usually, often, etc.) genellikle fiilden önce gelir."
+      ],
+      "examples": [
+        { "en": "I drink coffee every morning.", "tr": "Her sabah kahve içerim." },
+        { "en": "The sun rises in the east.", "tr": "Güneş doğudan doğar." },
+        { "en": "She works in a bank.", "tr": "O bir bankada çalışır." },
+        { "en": "Do you speak English?", "tr": "İngilizce konuşur musun?" },
+        { "en": "They don't like spicy food.", "tr": "Onlar baharatlı yemek sevmezler." }
+      ]
+    },
+    {
+      "id": "present_continuous",
+      "title": "Present Continuous (Şimdiki Zaman)",
+      "level": "A1",
+      "explanation": "Şu an gerçekleşmekte olan eylemleri anlatmak için kullanılır. Ayrıca yakın gelecek planları için de tercih edilebilir.",
+      "rules": [
+        "Özne + am/is/are + Fiil(ing) yapısı kullanılır.",
+        "Olumsuz hali 'am not, isn't, aren't' şeklindedir.",
+        "Soru sormak için 'am/is/are' başa gelir.",
+        "Now, at the moment, right now gibi zaman zarfları sıkça görülür."
+      ],
+      "examples": [
+        { "en": "I am writing a letter right now.", "tr": "Şu an bir mektup yazıyorum." },
+        { "en": "What are you doing?", "tr": "Ne yapıyorsun?" },
+        { "en": "They are playing football in the garden.", "tr": "Bahçede futbol oynuyorlar." },
+        { "en": "It is raining outside.", "tr": "Dışarıda yağmur yağıyor." },
+        { "en": "She isn't listening to me.", "tr": "O beni dinlemiyor." }
+      ]
+    },
+    {
+      "id": "past_simple",
+      "title": "Past Simple (Geçmiş Zaman)",
+      "level": "A2",
+      "explanation": "Geçmişte belirli bir zamanda başlayıp bitmiş eylemleri ifade eder. Fiillerin ikinci halleri kullanılır.",
+      "rules": [
+        "Düzenli fiillerin sonuna '-ed' takısı gelir.",
+        "Düzensiz fiiller tamamen değişebilir (go -> went, see -> saw).",
+        "Soru ve olumsuz cümlelerde 'did' yardımcı fiili kullanılır.",
+        "Did kullanıldığında fiil 1. haline (yalın hal) döner."
+      ],
+      "examples": [
+        { "en": "I watched a movie yesterday.", "tr": "Dün bir film izledim." },
+        { "en": "We went to London last summer.", "tr": "Geçen yaz Londra'ya gittik." },
+        { "en": "Did you see my keys?", "tr": "Anahtarlarımı gördün mü?" },
+        { "en": "He didn't call me last night.", "tr": "Dün gece beni aramadı." },
+        { "en": "Shakespeare wrote many plays.", "tr": "Shakespeare birçok oyun yazdı." }
+      ]
+    },
+    {
+      "id": "future_simple",
+      "title": "Future Simple (Gelecek Zaman - Will)",
+      "level": "A1",
+      "explanation": "Gelecekteki tahminler, ani kararlar veya sözler için kullanılır. Planlanmamış eylemler için 'will' tercih edilir.",
+      "rules": [
+        "Fiil her zaman yalın haldedir.",
+        "Özne + will + Fiil yapısı kullanılır.",
+        "Olumsuz hali 'will not' veya 'won't' şeklindedir.",
+        "Tomorrow, next week, soon gibi zaman kelimeleri kullanılır."
+      ],
+      "examples": [
+        { "en": "I will help you with your homework.", "tr": "Ödevine yardım edeceğim." },
+        { "en": "It will rain tomorrow.", "tr": "Yarın yağmur yağacak." },
+        { "en": "Will you marry me?", "tr": "Benimle evlenir misin?" },
+        { "en": "They won't come to the party.", "tr": "Partiye gelmeyecekler." },
+        { "en": "I think I will stay at home.", "tr": "Sanırım evde kalacağım." }
+      ]
+    },
+    {
+      "id": "modal_can",
+      "title": "Can (Yetenek ve İzin)",
+      "level": "A1",
+      "explanation": "Yetenekleri, olasılıkları veya izin isteme durumlarını ifade etmek için kullanılan bir yardımcı fiildir.",
+      "rules": [
+        "Soru ve olumsuz formda fiil yalın kalır.",
+        "Olumsuz hali 'cannot' veya 'can't' şeklindedir.",
+        "Tüm özneler için 'can' aynı kalır.",
+        "Modal fiillerden sonra 'to' gelmez."
+      ],
+      "examples": [
+        { "en": "I can play the piano.", "tr": "Piyano çalabilirim." },
+        { "en": "Can I open the window?", "tr": "Pencereyi açabilir miyim?" },
+        { "en": "She can't swim very well.", "tr": "O çok iyi yüzemez." },
+        { "en": "Birds can fly.", "tr": "Kuşlar uçabilir." },
+        { "en": "We can meet at 5 PM.", "tr": "Saat 17:00'de buluşabiliriz." }
+      ]
+    },
+    {
+      "id": "modal_must_should",
+      "title": "Must ve Should (Zorunluluk ve Tavsiye)",
+      "level": "A2",
+      "explanation": "Must güçlü bir zorunluluğu, should ise bir tavsiyeyi veya öneriyi belirtir.",
+      "rules": [
+        "Must: Kişisel zorunluluk veya yasaklar (mustn't).",
+        "Should: Doğru olanı yapmak için öneri (yapmalısın).",
+        "Her iki yapıdan sonra da fiil yalın gelir.",
+        "Olumsuz formlar: 'mustn't' ve 'shouldn't'."
+      ],
+      "examples": [
+        { "en": "You must wear a seatbelt.", "tr": "Emniyet kemeri takmalısın (zorunlu)." },
+        { "en": "You should drink more water.", "tr": "Daha fazla su içmelisin (tavsiye)." },
+        { "en": "We must not smoke here.", "tr": "Burada sigara içmemeliyiz." },
+        { "en": "He should study harder.", "tr": "Daha sıkı çalışmalı." },
+        { "en": "Must I go now?", "tr": "Şimdi gitmek zorunda mıyım?" }
+      ]
+    },
+    {
+      "id": "prepositions_place",
+      "title": "Prepositions of Place (Yer Edatları)",
+      "level": "A1",
+      "explanation": "Nesnelerin veya kişilerin nerede olduğunu belirtmek için in, on ve at gibi kelimeler kullanılır.",
+      "rules": [
+        "In: Genellikle kapalı alanlar veya şehir/ülke isimleri için (içinde).",
+        "On: Yüzeyler üzerinde (üstünde).",
+        "At: Belirli bir nokta veya konum için (de/da/yanında).",
+        "Under, Neer, Next to: Altında, Yakınında, Yanında."
+      ],
+      "examples": [
+        { "en": "The book is on the table.", "tr": "Kitap masanın üstünde." },
+        { "en": "I live in Istanbul.", "tr": "İstanbul'da yaşıyorum." },
+        { "en": "He is waiting at the bus stop.", "tr": "Otobüs durağında bekliyor." },
+        { "en": "The cat is under the chair.", "tr": "Kedi sandalyenin altında." },
+        { "en": "There is a painting on the wall.", "tr": "Duvarda bir tablo var." }
+      ]
+    },
+    {
+      "id": "adjectives_adverbs",
+      "title": "Adjectives and Adverbs (Sıfatlar ve Zarflar)",
+      "level": "A2",
+      "explanation": "Sıfatlar isimleri nitelelerken, zarflar fiilleri, sıfatları veya diğer zarfları niteleler.",
+      "rules": [
+        "Sıfatlar isimden önce gelir (Red apple).",
+        "Zarflar genellikle '-ly' takısı ile oluşturulur (Slowly).",
+        "Bazı zarflar düzensizdir (Good -> Well, Fast -> Fast).",
+        "Zarflar eylemin 'nasıl' yapıldığını söyler."
+      ],
+      "examples": [
+        { "en": "He is a fast runner.", "tr": "O hızlı bir koşucudur." },
+        { "en": "He runs fast.", "tr": "O hızlı koşar." },
+        { "en": "She is a beautiful singer.", "tr": "O güzel bir şarkıcıdır." },
+        { "en": "She sings beautifully.", "tr": "Güzel şarkı söyler." },
+        { "en": "The test was very easy.", "tr": "Sınav çok kolaydı." }
+      ]
+    },
+    {
+      "id": "pronouns",
+      "title": "Pronouns (Zamirler)",
+      "level": "A1",
+      "explanation": "İsimlerin yerine geçen kelimelerdir. İngilizce'de kişi zamirleri, iyelik zamirleri ve nesne zamirleri farklılık gösterir.",
+      "rules": [
+        "Subject Pronouns: I, You, He, She, It, We, They.",
+        "Object Pronouns: Me, You, Him, Her, It, Us, Them.",
+        "Possessive Adjectives: My, Your, His, Her, Its, Our, Their.",
+        "Possessive Pronouns: Mine, Yours, His, Hers, Ours, Theirs."
+      ],
+      "examples": [
+        { "en": "I saw her at the cinema.", "tr": "Onu sinemada gördüm." },
+        { "en": "This is my car.", "tr": "Bu benim arabam." },
+        { "en": "Give it to me.", "tr": "Onu bana ver." },
+        { "en": "They are our friends.", "tr": "Onlar bizim arkadaşlarımız." },
+        { "en": "The decision is yours.", "tr": "Karar senin." }
+      ]
+    },
+    {
+      "id": "present_perfect",
+      "title": "Present Perfect (Yakın Geçmiş Zaman)",
+      "level": "B1",
+      "explanation": "Geçmişte olan ancak etkisi devam eden veya zamanı önemsiz olan eylemleri anlatır.",
+      "rules": [
+        "Özne + have/has + Fiil(3. hal) yapısı kullanılır.",
+        "Have/Has + been + Fiil(ing) yapısı süreci vurgular.",
+        "Just, already, yet, ever, never gibi zarflar sıkça kullanılır.",
+        "Zaman belirtilmezse genellikle bu yapı tercih edilir."
+      ],
+      "examples": [
+        { "en": "I have seen this movie before.", "tr": "Bu filmi daha önce izledim." },
+        { "en": "She has lived here for ten years.", "tr": "On yıldır burada yaşıyor." },
+        { "en": "Have you ever been to Paris?", "tr": "Hiç Paris'te bulundun mu?" },
+        { "en": "They haven't finished their dinner yet.", "tr": "Yemeklerini henüz bitirmediler." },
+        { "en": "He has lost his keys.", "tr": "Anahtarlarını kaybetti." }
+      ]
+    },
+    {
+      "id": "comparatives_superlatives",
+      "title": "Comparatives and Superlatives (Karşılaştırma Yapıları)",
+      "level": "A2",
+      "explanation": "İki nesneyi karşılaştırmak (Comparative) veya bir grubun en iyisini belirtmek (Superlative) için kullanılır.",
+      "rules": [
+        "Kısa sıfatlarda '-er' (Comparative) ve '-est' (Superlative) takıları gelir.",
+        "Uzun sıfatlarda 'more' (Comparative) ve 'the most' (Superlative) kullanılır.",
+        "Düzensiz sıfatlar: Good -> Better -> The Best, Bad -> Worse -> The Worst.",
+        "Karşılaştırma yaparken 'than' kelimesi kullanılır."
+      ],
+      "examples": [
+        { "en": "My car is faster than yours.", "tr": "Benim arabam seninkinden daha hızlı." },
+        { "en": "She is the most beautiful girl in the class.", "tr": "O sınıftaki en güzel kızdır." },
+        { "en": "Today is colder than yesterday.", "tr": "Bugün dünden daha soğuk." },
+        { "en": "This is the best pizza I've ever eaten.", "tr": "Bu şimdiye kadar yediğim en iyi pizza." },
+        { "en": "A plane is more expensive than a car.", "tr": "Uçak arabadan daha pahalıdır." }
+      ]
+    },
+    {
+      "id": "relative_clauses",
+      "title": "Relative Clauses (Sıfat Cümlecikleri)",
+      "level": "B1",
+      "explanation": "İsimleri tanımlamak veya onlar hakkında ekstra bilgi vermek için kullanılır. Who, which ve that en yaygın olanlarıdır.",
+      "rules": [
+        "Who: İnsanlar için kullanılır.",
+        "Which: Cisimler ve hayvanlar için kullanılır.",
+        "That: Hem insanlar hem de cisimler için kullanılabilir.",
+        "Whose: Sahiplik belirtmek için (onun ki) kullanılır."
+      ],
+      "examples": [
+        { "en": "The man who lives next door is a doctor.", "tr": "Yan kapıda yaşayan adam doktordur." },
+        { "en": "This is the book which I bought yesterday.", "tr": "Bu dün aldığım kitaptır." },
+        { "en": "The dog that is barking is mine.", "tr": "Havlayan köpek benimkidir." },
+        { "en": "The boy whose father is a teacher is my friend.", "tr": "Babası öğretmen olan çocuk benim arkadaşımdır." },
+        { "en": "I know a place where we can eat sushi.", "tr": "Sushi yiyebileceğimiz bir yer biliyorum." }
+      ]
+    },
+    {
+      "id": "passive_voice",
+      "title": "Passive Voice (Edilgen Yapı)",
+      "level": "B1",
+      "explanation": "Eylemi yapanın değil, eylemden etkilenen nesnenin önemli olduğu durumlarda kullanılır.",
+      "rules": [
+        "Be (am/is/are/was/were) + Fiil(3. hal) yapısı kullanılır.",
+        "Eylemi yapanı belirtmek istiyorsak 'by' kelimesini ekleriz.",
+        "Nesne, cümlede özne konumuna geçer.",
+        "Zaman kipi 'be' fiili üzerinden ayarlanır."
+      ],
+      "examples": [
+        { "en": "The car was repaired by the mechanic.", "tr": "Araba tamirci tarafından onarıldı." },
+        { "en": "English is spoken all over the world.", "tr": "İngilizce tüm dünyada konuşulur." },
+        { "en": "A new hospital is being built.", "tr": "Yeni bir hastane inşa ediliyor." },
+        { "en": "The letter was written in 1990.", "tr": "Mektup 1990 yılında yazıldı." },
+        { "en": "The cake has been eaten.", "tr": "Kek yenildi." }
+      ]
+    }
+  ]
+}
