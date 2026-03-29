@@ -26,8 +26,35 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="grammar"
+        options={{
+          title: 'Grammar',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="tenses"
+        options={{
+          title: 'Tenses',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="vocabulary"
+        options={{
+          title: 'Vocabulary',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="text.book.closed.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="quiz"
+        options={{
+          title: 'Quiz',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="brain.head.profile" color={color} />,
         }}
       />
     </Tabs>
