@@ -61,6 +61,17 @@ export default function HomeScreen() {
             <Text style={styles.cardSubtitle}>Start Review</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.card} onPress={() => router.push('/word-game')}>
+            <View style={[styles.iconContainer, { backgroundColor: '#EDE9FE' }]}>
+              <Ionicons name="game-controller" size={24} color="#7C3AED" />
+            </View>
+            <Text style={styles.cardTitle}>Word Game</Text>
+            <Text style={styles.cardSubtitle}>Kelime Oyunu</Text>
+          </TouchableOpacity>
+          <View style={{ width: '48%' }} />
+        </View>
       </View>
 
       {/* Quick Quiz Button */}
