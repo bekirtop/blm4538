@@ -1,9 +1,11 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useMistakes } from '@/context/MistakesContext';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { mistakes, removeMistake } = useMistakes();
 
   return (
     <ScrollView style={styles.container} bounces={false}>
@@ -11,7 +13,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <SafeAreaView>
           <Text style={styles.greeting}>Hello, Learner! 👋</Text>
-          <Text style={styles.subtitle}>Let's continue your learning journey</Text>
+          <Text style={styles.subtitle}>Let&apos;s continue your learning journey</Text>
           
           {/* Progress Card */}
           <View style={styles.progressCard}>
@@ -81,6 +83,25 @@ export default function HomeScreen() {
           <Text style={styles.quizButtonText}>Quick Quiz</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Yanlışlarım (Mistakes) Section */}
+      {mistakes.length > 0 && (
+        <View style={styles.mistakesSection}>
+          <Text style={styles.mistakesSectionTitle}>Yanlışlarım ({mistakes.length})</Text>
+          {mistakes.map((m, idx) => (
+            <View key={idx} style={styles.mistakeItem}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.mistakeWord}>{m.word}</Text>
+                <Text style={styles.mistakeTurkish}>{m.turkish}</Text>
+                {m.example && <Text style={styles.mistakeExample}>{m.example}</Text>}
+              </View>
+              <TouchableOpacity onPress={() => removeMistake(m.word)} style={styles.mistakeRemoveBtn}>
+                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -102,7 +123,14 @@ const styles = StyleSheet.create({
   iconContainer: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   cardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1E293B', marginBottom: 4 },
   cardSubtitle: { fontSize: 12, color: '#94A3B8' },
-  bottomContainer: { paddingHorizontal: 20, marginTop: 10, marginBottom: 30 },
+  bottomContainer: { paddingHorizontal: 20, marginTop: 10, marginBottom: 15 },
   quizButton: { backgroundColor: '#2EBC9D', borderRadius: 16, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   quizButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold', marginLeft: 8 },
+  mistakesSection: { paddingHorizontal: 20, paddingBottom: 40 },
+  mistakesSectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#1E293B', marginBottom: 12 },
+  mistakeItem: { flexDirection: 'row', backgroundColor: '#FFFFFF', padding: 16, borderRadius: 16, marginBottom: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, elevation: 2, alignItems: 'center' },
+  mistakeWord: { fontSize: 16, fontWeight: 'bold', color: '#EF4444', marginBottom: 4 },
+  mistakeTurkish: { fontSize: 14, color: '#1E293B' },
+  mistakeExample: { fontSize: 12, color: '#64748B', marginTop: 4, fontStyle: 'italic' },
+  mistakeRemoveBtn: { padding: 8, backgroundColor: '#FEE2E2', borderRadius: 8, marginLeft: 12 },
 });

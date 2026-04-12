@@ -2,31 +2,35 @@ import { StyleSheet, View, Text, FlatList, TouchableOpacity, SafeAreaView } from
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useMemo } from 'react';
 import Data from '../../constants/merged.json';
+import { useMistakes } from '@/context/MistakesContext';
 
 const filters = [
   { label: 'All', value: 'all' },
   { label: 'Beginner', value: 1 },
   { label: 'Intermediate', value: 2 },
   { label: 'Advanced', value: 3 },
+  { label: 'Mistakes', value: 'mistakes' },
 ];
 
 export default function VocabularyScreen() {
   const [activeFilter, setActiveFilter] = useState<string | number>('all');
+  const { mistakes } = useMistakes();
 
   const filteredWords = useMemo(() => {
+    if (activeFilter === 'mistakes') return mistakes;
     if (activeFilter === 'all') return Data.words.slice(0, 200); 
     return Data.words.filter(w => {
       if (activeFilter === 1) return w.difficulty === 1;
       if (activeFilter === 2) return w.difficulty === 2;
       return w.difficulty && w.difficulty >= 3;
     }).slice(0, 200); // 200 keeps performance smooth
-  }, [activeFilter]);
+  }, [activeFilter, mistakes]);
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.wordCard}>
       <View style={styles.wordInfo}>
         <Text style={styles.wordText}>{item.word}</Text>
-        {item.example ? <Text style={styles.exampleText}>"{item.example}"</Text> : null}
+        {item.example ? <Text style={styles.exampleText}>&quot;{item.example}&quot;</Text> : null}
         <Text style={styles.meaningText}>{item.turkish}</Text>
       </View>
       <TouchableOpacity style={styles.speakerButton}>

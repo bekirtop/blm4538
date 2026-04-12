@@ -1,9 +1,10 @@
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Data from '../../constants/merged.json';
+import { useMistakes } from '@/context/MistakesContext';
 
-type GameMode = 'en-tr' | 'tr-en';
+type GameMode = 'en-tr' | 'tr-en' | 'scramble' | 'flashcard';
 type Difficulty = 'easy' | 'medium' | 'hard';
 type GamePhase = 'setup' | 'playing' | 'result';
 
@@ -11,6 +12,9 @@ interface QuizQuestion {
   word: string;
   correctAnswer: string;
   options: string[];
+  example?: string;
+  originalWord: string;
+  originalTurkish: string;
 }
 
 const difficultyRanges: Record<Difficulty, { min: number; max: number; label: string; color: string; icon: string }> = {
@@ -41,27 +45,49 @@ function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number
   const selected = shuffleArray(pool).slice(0, count);
 
   return selected.map(item => {
-    const correctAnswer = mode === 'en-tr' ? item.turkish : item.word;
-    const questionWord = mode === 'en-tr' ? item.word : item.turkish;
+    let correctAnswer = '';
+    let questionWord = '';
 
-    // Pick 3 distractors from the same pool
+    if (mode === 'en-tr' || mode === 'flashcard') {
+      correctAnswer = item.turkish;
+      questionWord = item.word;
+    } else if (mode === 'tr-en') {
+      correctAnswer = item.word;
+      questionWord = item.turkish;
+    } else if (mode === 'scramble') {
+      correctAnswer = item.word; // User needs to type English
+      questionWord = item.turkish; // Show Turkish
+    }
+
+    // Pick 3 distractors from the same pool for quiz modes
     const distractors: string[] = [];
-    const otherWords = shuffleArray(pool.filter(w => w.word !== item.word));
-    for (const w of otherWords) {
-      const val = mode === 'en-tr' ? w.turkish : w.word;
-      if (val !== correctAnswer && !distractors.includes(val)) {
-        distractors.push(val);
+    if (mode === 'en-tr' || mode === 'tr-en') {
+      const otherWords = shuffleArray(pool.filter(w => w.word !== item.word));
+      for (const w of otherWords) {
+        const val = mode === 'en-tr' ? w.turkish : w.word;
+        if (val !== correctAnswer && !distractors.includes(val)) {
+          distractors.push(val);
+        }
+        if (distractors.length === 3) break;
       }
-      if (distractors.length === 3) break;
     }
 
     const options = shuffleArray([correctAnswer, ...distractors]);
 
-    return { word: questionWord, correctAnswer, options };
+    return { 
+      word: questionWord, 
+      correctAnswer, 
+      options,
+      example: item.example,
+      originalWord: item.word,
+      originalTurkish: item.turkish
+    };
   });
 }
 
 export default function WordGameScreen() {
+  const { addMistake } = useMistakes();
+  
   const [phase, setPhase] = useState<GamePhase>('setup');
   const [mode, setMode] = useState<GameMode>('en-tr');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -73,9 +99,23 @@ export default function WordGameScreen() {
   const [score, setScore] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  // Scramble State
+  const [scrambleLetters, setScrambleLetters] = useState<{id: string, char: string, used: boolean}[]>([]);
+  const [scrambleSelected, setScrambleSelected] = useState<{id: string, char: string}[]>([]);
+
+  // Flashcard State
+  const [flashcardRevealed, setFlashcardRevealed] = useState(false);
+
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
   }, [phase]);
+
+  const initScramble = (word: string) => {
+    const chars = word.replace(/\s+/g, '').split(''); // Remove spaces for scramble
+    const shuffled = shuffleArray(chars.map((char, i) => ({ id: `${i}-${char}`, char, used: false })));
+    setScrambleLetters(shuffled);
+    setScrambleSelected([]);
+  };
 
   const startGame = () => {
     const q = generateQuestions(mode, difficulty, questionCount);
@@ -85,28 +125,95 @@ export default function WordGameScreen() {
     setScore(0);
     setSelectedOption(null);
     setHasChecked(false);
+    setFlashcardRevealed(false);
+    
+    if (mode === 'scramble') {
+      initScramble(q[0].correctAnswer);
+    }
+    
     fadeAnim.setValue(0);
     setPhase('playing');
   };
 
-  const handleCheck = () => {
-    if (!hasChecked) {
-      setHasChecked(true);
-      if (selectedOption === questions[currentIndex].correctAnswer) {
-        setScore(s => s + 1);
-      }
+  const handleNext = () => {
+    if (currentIndex === questions.length - 1) {
+      fadeAnim.setValue(0);
+      setPhase('result');
     } else {
-      if (currentIndex === questions.length - 1) {
-        fadeAnim.setValue(0);
-        setPhase('result');
-      } else {
-        setCurrentIndex(i => i + 1);
-        setSelectedOption(null);
-        setHasChecked(false);
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setSelectedOption(null);
+      setHasChecked(false);
+      setFlashcardRevealed(false);
+      if (mode === 'scramble') {
+        initScramble(questions[nextIndex].correctAnswer);
       }
     }
   };
 
+  const handleQuizCheck = () => {
+    if (!hasChecked) {
+      setHasChecked(true);
+      if (selectedOption === questions[currentIndex].correctAnswer) {
+        setScore(s => s + 1);
+      } else {
+        // Record mistake
+        addMistake({
+          word: questions[currentIndex].originalWord,
+          turkish: questions[currentIndex].originalTurkish,
+          example: questions[currentIndex].example
+        });
+      }
+    } else {
+      handleNext();
+    }
+  };
+
+  // ── Scramble Logic ──
+  const toggleScrambleLetter = (letter: {id: string, char: string, used: boolean}) => {
+    if (letter.used || hasChecked) return;
+    setScrambleLetters(prev => prev.map(l => l.id === letter.id ? { ...l, used: true } : l));
+    setScrambleSelected(prev => [...prev, { id: letter.id, char: letter.char }]);
+  };
+
+  const removeScrambleLetter = (letterId: string) => {
+    if (hasChecked) return;
+    setScrambleSelected(prev => prev.filter(l => l.id !== letterId));
+    setScrambleLetters(prev => prev.map(l => l.id === letterId ? { ...l, used: false } : l));
+  };
+
+  const checkScramble = () => {
+    const currentQ = questions[currentIndex];
+    const attempt = scrambleSelected.map(s => s.char).join('').toLowerCase();
+    const target = currentQ.correctAnswer.replace(/\s+/g, '').toLowerCase();
+
+    setHasChecked(true);
+    if (attempt === target) {
+      setScore(s => s + 1);
+    } else {
+      addMistake({
+        word: currentQ.originalWord,
+        turkish: currentQ.originalTurkish,
+        example: currentQ.example
+      });
+    }
+  };
+
+  // ── Flashcard Logic ──
+  const handleFlashcardAnswer = (knewIt: boolean) => {
+    if (!knewIt) {
+      addMistake({
+        word: questions[currentIndex].originalWord,
+        turkish: questions[currentIndex].originalTurkish,
+        example: questions[currentIndex].example
+      });
+    } else {
+      setScore(s => s + 1);
+    }
+    setFlashcardRevealed(true);
+  };
+
+  // ── Helpers ──
   const getOptionStyle = (opt: string) => {
     if (!hasChecked) return selectedOption === opt ? styles.optSelected : {};
     if (opt === questions[currentIndex].correctAnswer) return styles.optCorrect;
@@ -129,39 +236,41 @@ export default function WordGameScreen() {
           <Text style={styles.headerTitle}>Kelime Oyunu 🎯</Text>
           <Text style={styles.sectionSubtitle}>Kelime bilgini test et!</Text>
 
-          {/* Mode Selection */}
           <Text style={styles.sectionTitle}>Mod Seçimi</Text>
-          <View style={styles.modeRow}>
-            <TouchableOpacity
-              style={[styles.modeCard, mode === 'en-tr' && styles.modeCardActive]}
-              onPress={() => setMode('en-tr')}
-            >
-              <Ionicons name="language" size={28} color={mode === 'en-tr' ? '#fff' : '#2EBC9D'} />
+          <View style={styles.modeGrid}>
+            <TouchableOpacity style={[styles.modeCard, mode === 'en-tr' && styles.modeCardActive]} onPress={() => setMode('en-tr')}>
+              <Ionicons name="language" size={24} color={mode === 'en-tr' ? '#fff' : '#2EBC9D'} />
               <Text style={[styles.modeLabel, mode === 'en-tr' && styles.modeLabelActive]}>EN → TR</Text>
               <Text style={[styles.modeDesc, mode === 'en-tr' && styles.modeDescActive]}>İngilizce → Türkçe</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modeCard, mode === 'tr-en' && styles.modeCardActive]}
-              onPress={() => setMode('tr-en')}
-            >
-              <Ionicons name="swap-horizontal" size={28} color={mode === 'tr-en' ? '#fff' : '#2EBC9D'} />
+            
+            <TouchableOpacity style={[styles.modeCard, mode === 'tr-en' && styles.modeCardActive]} onPress={() => setMode('tr-en')}>
+              <Ionicons name="swap-horizontal" size={24} color={mode === 'tr-en' ? '#fff' : '#2EBC9D'} />
               <Text style={[styles.modeLabel, mode === 'tr-en' && styles.modeLabelActive]}>TR → EN</Text>
               <Text style={[styles.modeDesc, mode === 'tr-en' && styles.modeDescActive]}>Türkçe → İngilizce</Text>
             </TouchableOpacity>
           </View>
+          <View style={[styles.modeGrid, { marginTop: 12 }]}>
+            <TouchableOpacity style={[styles.modeCard, mode === 'scramble' && styles.modeCardActive]} onPress={() => setMode('scramble')}>
+              <Ionicons name="extension-puzzle" size={24} color={mode === 'scramble' ? '#fff' : '#F59E0B'} />
+              <Text style={[styles.modeLabel, mode === 'scramble' && styles.modeLabelActive]}>Karışık Harf</Text>
+              <Text style={[styles.modeDesc, mode === 'scramble' && styles.modeDescActive]}>Harfleri Diz</Text>
+            </TouchableOpacity>
 
-          {/* Difficulty Selection */}
+            <TouchableOpacity style={[styles.modeCard, mode === 'flashcard' && styles.modeCardActive]} onPress={() => setMode('flashcard')}>
+              <Ionicons name="albums" size={24} color={mode === 'flashcard' ? '#fff' : '#8B5CF6'} />
+              <Text style={[styles.modeLabel, mode === 'flashcard' && styles.modeLabelActive]}>Kart Modu</Text>
+              <Text style={[styles.modeDesc, mode === 'flashcard' && styles.modeDescActive]}>Öğren & Ezberle</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.sectionTitle}>Zorluk Seviyesi</Text>
           <View style={styles.diffRow}>
             {(Object.keys(difficultyRanges) as Difficulty[]).map(d => {
               const info = difficultyRanges[d];
               const active = difficulty === d;
               return (
-                <TouchableOpacity
-                  key={d}
-                  style={[styles.diffCard, active && { backgroundColor: info.color, borderColor: info.color }]}
-                  onPress={() => setDifficulty(d)}
-                >
+                <TouchableOpacity key={d} style={[styles.diffCard, active && { backgroundColor: info.color, borderColor: info.color }]} onPress={() => setDifficulty(d)}>
                   <Ionicons name={info.icon as any} size={22} color={active ? '#fff' : info.color} />
                   <Text style={[styles.diffLabel, active && { color: '#fff' }]}>{info.label}</Text>
                 </TouchableOpacity>
@@ -169,21 +278,15 @@ export default function WordGameScreen() {
             })}
           </View>
 
-          {/* Question Count */}
           <Text style={styles.sectionTitle}>Soru Sayısı</Text>
           <View style={styles.countRow}>
             {questionCounts.map(c => (
-              <TouchableOpacity
-                key={c}
-                style={[styles.countPill, questionCount === c && styles.countPillActive]}
-                onPress={() => setQuestionCount(c)}
-              >
+              <TouchableOpacity key={c} style={[styles.countPill, questionCount === c && styles.countPillActive]} onPress={() => setQuestionCount(c)}>
                 <Text style={[styles.countText, questionCount === c && styles.countTextActive]}>{c}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Start Button */}
           <TouchableOpacity style={styles.startButton} onPress={startGame}>
             <Ionicons name="play" size={22} color="#fff" />
             <Text style={styles.startButtonText}>Başla</Text>
@@ -201,7 +304,7 @@ export default function WordGameScreen() {
       <SafeAreaView style={styles.safeArea}>
         <Animated.View style={[styles.resultContainer, { opacity: fadeAnim }]}>  
           <Text style={styles.resultEmoji}>{emoji}</Text>
-          <Text style={styles.resultTitle}>Quiz Bitti!</Text>
+          <Text style={styles.resultTitle}>Oyun Bitti!</Text>
           <View style={styles.resultScoreCard}>
             <Text style={styles.resultScoreLabel}>Skorun</Text>
             <Text style={styles.resultScoreValue}>{score} / {questions.length}</Text>
@@ -243,10 +346,9 @@ export default function WordGameScreen() {
           </View>
         </View>
 
-        {/* Progress */}
         <View style={styles.progressSection}>
           <View style={styles.progressRow}>
-            <Text style={styles.progressLabel}>Soru {currentIndex + 1}/{questions.length}</Text>
+            <Text style={styles.progressLabel}>{mode === 'flashcard' ? 'Kart' : 'Soru'} {currentIndex + 1}/{questions.length}</Text>
             <Text style={styles.progressPct}>%{progress}</Text>
           </View>
           <View style={styles.progressBg}>
@@ -254,54 +356,159 @@ export default function WordGameScreen() {
           </View>
         </View>
 
-        {/* Mode Badge */}
         <View style={styles.modeBadge}>
-          <Text style={styles.modeBadgeText}>{mode === 'en-tr' ? '🇬🇧 → 🇹🇷' : '🇹🇷 → 🇬🇧'}</Text>
-        </View>
-
-        {/* Question */}
-        <View style={styles.questionCard}>
-          <Text style={styles.questionLabel}>{mode === 'en-tr' ? 'Bu kelimenin Türkçesi nedir?' : 'Bu kelimenin İngilizcesi nedir?'}</Text>
-          <Text style={styles.questionWord}>{current.word}</Text>
-        </View>
-
-        {/* Options */}
-        <View style={styles.optionsContainer}>
-          {current.options.map((opt, i) => (
-            <TouchableOpacity
-              key={i}
-              style={[styles.optionBtn, getOptionStyle(opt)]}
-              onPress={() => !hasChecked && setSelectedOption(opt)}
-              activeOpacity={hasChecked ? 1 : 0.7}
-            >
-              <View style={[styles.optLetter, hasChecked && opt === current.correctAnswer && { backgroundColor: '#10B981' }, hasChecked && selectedOption === opt && opt !== current.correctAnswer && { backgroundColor: '#EF4444' }, !hasChecked && selectedOption === opt && { backgroundColor: '#2EBC9D' }]}>
-                <Text style={[styles.optLetterText, (selectedOption === opt || (hasChecked && opt === current.correctAnswer)) && { color: '#fff' }]}>
-                  {String.fromCharCode(65 + i)}
-                </Text>
-              </View>
-              <Text style={[styles.optText, getOptTextStyle(opt)]} numberOfLines={2}>{opt}</Text>
-              {hasChecked && opt === current.correctAnswer && (
-                <Ionicons name="checkmark-circle" size={24} color="#fff" style={{ marginLeft: 'auto' }} />
-              )}
-              {hasChecked && selectedOption === opt && opt !== current.correctAnswer && (
-                <Ionicons name="close-circle" size={24} color="#fff" style={{ marginLeft: 'auto' }} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={{ flex: 1 }} />
-
-        {/* Check / Next Button */}
-        <TouchableOpacity
-          style={[styles.checkBtn, selectedOption ? styles.checkBtnActive : styles.checkBtnInactive]}
-          disabled={!selectedOption}
-          onPress={handleCheck}
-        >
-          <Text style={[styles.checkBtnText, selectedOption ? { color: '#fff' } : { color: '#94A3B8' }]}>
-            {hasChecked ? (currentIndex === questions.length - 1 ? 'Sonuçları Gör' : 'Sonraki Soru') : 'Kontrol Et'}
+          <Text style={styles.modeBadgeText}>
+            {mode === 'en-tr' ? '🇬🇧 → 🇹🇷 Test' : mode === 'tr-en' ? '🇹🇷 → 🇬🇧 Test' : mode === 'scramble' ? '🔤 Karışık Harf' : '📇 Kart Modu'}
           </Text>
-        </TouchableOpacity>
+        </View>
+
+        {/* ── Scramble View ── */}
+        {mode === 'scramble' && (
+          <View style={{ flex: 1 }}>
+            <View style={styles.questionCard}>
+              <Text style={styles.questionLabel}>Bu kelimenin İngilizcesi nedir?</Text>
+              <Text style={styles.questionWord}>{current.word}</Text>
+            </View>
+
+            <View style={styles.scrambleSlotsRow}>
+              {current.correctAnswer.replace(/\s+/g, '').split('').map((char, i) => {
+                const filled = scrambleSelected[i];
+                let isIncorrect = false;
+                if (hasChecked) {
+                  const targetArr = current.correctAnswer.replace(/\s+/g, '').toLowerCase().split('');
+                  isIncorrect = scrambleSelected.map(s => s.char.toLowerCase()).join('') !== targetArr.join('');
+                }
+
+                return (
+                  <TouchableOpacity 
+                    key={`slot-${i}`} 
+                    style={[
+                      styles.scrambleSlot, 
+                      filled ? styles.scrambleSlotFilled : null,
+                      hasChecked && !isIncorrect ? styles.scrambleSlotCorrect : null,
+                      hasChecked && isIncorrect ? styles.scrambleSlotIncorrect : null
+                    ]}
+                    onPress={() => filled ? removeScrambleLetter(filled.id) : null}
+                    disabled={hasChecked}
+                  >
+                    <Text style={[styles.scrambleSlotText, hasChecked && { color: '#fff' }]}>{filled ? filled.char : ''}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {!hasChecked && (
+              <View style={styles.scrambleLettersRow}>
+                {scrambleLetters.map((item) => (
+                  <TouchableOpacity 
+                    key={item.id} 
+                    style={[styles.scrambleLetter, item.used && { opacity: 0.3 }]}
+                    onPress={() => toggleScrambleLetter(item)}
+                    disabled={item.used}
+                  >
+                    <Text style={styles.scrambleLetterText}>{item.char}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            <View style={{ flex: 1 }} />
+
+            <TouchableOpacity
+              style={[styles.checkBtn, scrambleSelected.length === current.correctAnswer.replace(/\s+/g, '').length || hasChecked ? styles.checkBtnActive : styles.checkBtnInactive]}
+              disabled={scrambleSelected.length !== current.correctAnswer.replace(/\s+/g, '').length && !hasChecked}
+              onPress={() => hasChecked ? handleNext() : checkScramble()}
+            >
+              <Text style={[styles.checkBtnText, { color: scrambleSelected.length === current.correctAnswer.replace(/\s+/g, '').length || hasChecked ? '#fff' : '#94A3B8' }]}>
+                {hasChecked ? (currentIndex === questions.length - 1 ? 'Sonuçları Gör' : 'Sonraki Kelime') : 'Kontrol Et'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ── Quiz View (en-tr / tr-en) ── */}
+        {(mode === 'en-tr' || mode === 'tr-en') && (
+          <View style={{ flex: 1 }}>
+            <View style={styles.questionCard}>
+              <Text style={styles.questionLabel}>{mode === 'en-tr' ? 'Bu kelimenin Türkçesi nedir?' : 'Bu kelimenin İngilizcesi nedir?'}</Text>
+              <Text style={styles.questionWord}>{current.word}</Text>
+            </View>
+
+            <View style={styles.optionsContainer}>
+              {current.options.map((opt, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.optionBtn, getOptionStyle(opt)]}
+                  onPress={() => !hasChecked && setSelectedOption(opt)}
+                  activeOpacity={hasChecked ? 1 : 0.7}
+                >
+                  <View style={[styles.optLetter, hasChecked && opt === current.correctAnswer && { backgroundColor: '#10B981' }, hasChecked && selectedOption === opt && opt !== current.correctAnswer && { backgroundColor: '#EF4444' }, !hasChecked && selectedOption === opt && { backgroundColor: '#2EBC9D' }]}>
+                    <Text style={[styles.optLetterText, (selectedOption === opt || (hasChecked && opt === current.correctAnswer)) && { color: '#fff' }]}>
+                      {String.fromCharCode(65 + i)}
+                    </Text>
+                  </View>
+                  <Text style={[styles.optText, getOptTextStyle(opt)]} numberOfLines={2}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            <TouchableOpacity
+              style={[styles.checkBtn, selectedOption || hasChecked ? styles.checkBtnActive : styles.checkBtnInactive]}
+              disabled={!selectedOption && !hasChecked}
+              onPress={handleQuizCheck}
+            >
+              <Text style={[styles.checkBtnText, selectedOption || hasChecked ? { color: '#fff' } : { color: '#94A3B8' }]}>
+                {hasChecked ? (currentIndex === questions.length - 1 ? 'Sonuçları Gör' : 'Sonraki Soru') : 'Kontrol Et'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ── Flashcard View ── */}
+        {mode === 'flashcard' && (
+          <View style={{ flex: 1 }}>
+            <View style={[styles.flashcard, flashcardRevealed && styles.flashcardRevealed]}>
+              <Text style={styles.flashcardWord}>{current.word}</Text>
+              
+              {flashcardRevealed && (
+                <Animated.View style={styles.flashcardDetails}>
+                  <View style={styles.divider} />
+                  <Text style={styles.flashcardTranslation}>{current.originalTurkish}</Text>
+                  {current.example && (
+                    <Text style={styles.flashcardExample}>&quot;{current.example}&quot;</Text>
+                  )}
+                </Animated.View>
+              )}
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            {!flashcardRevealed ? (
+              <View style={styles.flashBtnsRow}>
+                <TouchableOpacity style={styles.flashBtnFail} onPress={() => handleFlashcardAnswer(false)}>
+                  <Ionicons name="close-circle" size={24} color="#EF4444" />
+                  <Text style={styles.flashBtnFailText}>Bilemedim</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.flashBtnSuccess} onPress={() => handleFlashcardAnswer(true)}>
+                  <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                  <Text style={styles.flashBtnSuccessText}>Bildim</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.checkBtn, styles.checkBtnActive]}
+                onPress={handleNext}
+              >
+                <Text style={[styles.checkBtnText, { color: '#fff' }]}>
+                  {currentIndex === questions.length - 1 ? 'Sonuçları Gör' : 'Sonraki Kelime'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
       </View>
     </SafeAreaView>
   );
@@ -314,13 +521,13 @@ const styles = StyleSheet.create({
   sectionSubtitle: { fontSize: 15, color: '#94A3B8', marginBottom: 24 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 12, marginTop: 8 },
 
-  // Mode
-  modeRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  modeCard: { flex: 1, backgroundColor: '#F0FDF8', borderWidth: 2, borderColor: '#D1FAE5', borderRadius: 16, padding: 16, alignItems: 'center', gap: 6 },
+  // Mode List
+  modeGrid: { flexDirection: 'row', gap: 12 },
+  modeCard: { flex: 1, backgroundColor: '#F8FAFC', borderWidth: 2, borderColor: '#E2E8F0', borderRadius: 16, padding: 16, alignItems: 'center', gap: 6 },
   modeCardActive: { backgroundColor: '#2EBC9D', borderColor: '#2EBC9D' },
-  modeLabel: { fontSize: 16, fontWeight: 'bold', color: '#1E293B' },
+  modeLabel: { fontSize: 15, fontWeight: 'bold', color: '#1E293B' },
   modeLabelActive: { color: '#fff' },
-  modeDesc: { fontSize: 12, color: '#64748B' },
+  modeDesc: { fontSize: 11, color: '#64748B' },
   modeDescActive: { color: '#D1FAE5' },
 
   // Difficulty
@@ -354,12 +561,13 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', backgroundColor: '#2EBC9D', borderRadius: 3 },
 
   modeBadge: { alignSelf: 'center', backgroundColor: '#F0F9FF', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, marginBottom: 12 },
-  modeBadgeText: { fontSize: 16, fontWeight: '600', color: '#0284C7' },
+  modeBadgeText: { fontSize: 14, fontWeight: '600', color: '#0284C7' },
 
   questionCard: { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 20, padding: 28, alignItems: 'center', marginBottom: 20 },
   questionLabel: { fontSize: 13, color: '#94A3B8', marginBottom: 8 },
   questionWord: { fontSize: 26, fontWeight: 'bold', color: '#1E293B', textAlign: 'center' },
 
+  // Quiz Options
   optionsContainer: { gap: 10 },
   optionBtn: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E2E8F0', borderRadius: 14, padding: 14, backgroundColor: '#fff' },
   optSelected: { borderColor: '#2EBC9D', backgroundColor: '#2EBC9D' },
@@ -368,6 +576,32 @@ const styles = StyleSheet.create({
   optLetter: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   optLetterText: { fontSize: 14, fontWeight: 'bold', color: '#64748B' },
   optText: { fontSize: 15, color: '#1E293B', fontWeight: '500', flex: 1 },
+
+  // Scramble View
+  scrambleSlotsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10, marginBottom: 30 },
+  scrambleSlot: { width: 44, height: 50, borderRadius: 12, backgroundColor: '#F1F5F9', borderWidth: 2, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center' },
+  scrambleSlotFilled: { borderColor: '#94A3B8' },
+  scrambleSlotCorrect: { backgroundColor: '#10B981', borderColor: '#10B981' },
+  scrambleSlotIncorrect: { backgroundColor: '#EF4444', borderColor: '#EF4444' },
+  scrambleSlotText: { fontSize: 22, fontWeight: 'bold', color: '#1E293B' },
+  scrambleLettersRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 },
+  scrambleLetter: { width: 45, height: 45, borderRadius: 10, backgroundColor: '#E0E7FF', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset:{width:0, height:2}, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 },
+  scrambleLetterText: { fontSize: 20, fontWeight: 'bold', color: '#4F46E5' },
+
+  // Flashcard View
+  flashcard: { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 24, padding: 30, alignItems: 'center', justifyContent: 'center', minHeight: 250, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 4 },
+  flashcardRevealed: { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' },
+  flashcardWord: { fontSize: 32, fontWeight: 'bold', color: '#1E293B', textAlign: 'center' },
+  flashcardDetails: { marginTop: 24, alignItems: 'center', width: '100%' },
+  divider: { width: 40, height: 4, backgroundColor: '#E2E8F0', borderRadius: 2, marginBottom: 16 },
+  flashcardTranslation: { fontSize: 22, fontWeight: '600', color: '#10B981', marginBottom: 12, textAlign: 'center' },
+  flashcardExample: { fontSize: 16, color: '#64748B', fontStyle: 'italic', textAlign: 'center', paddingHorizontal: 10 },
+  
+  flashBtnsRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  flashBtnFail: { flex: 1, flexDirection: 'row', backgroundColor: '#FEF2F2', borderWidth: 2, borderColor: '#FECACA', borderRadius: 16, paddingVertical: 18, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  flashBtnFailText: { fontSize: 16, fontWeight: 'bold', color: '#EF4444' },
+  flashBtnSuccess: { flex: 1, flexDirection: 'row', backgroundColor: '#F0FDF4', borderWidth: 2, borderColor: '#BBF7D0', borderRadius: 16, paddingVertical: 18, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  flashBtnSuccessText: { fontSize: 16, fontWeight: 'bold', color: '#10B981' },
 
   checkBtn: { borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginBottom: 20 },
   checkBtnInactive: { backgroundColor: '#E2E8F0' },
