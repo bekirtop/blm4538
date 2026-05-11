@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useMemo } from 'react';
+import { useProgress } from '@/context/ProgressContext';
 
 type QuizPhase = 'topics' | 'playing';
 
@@ -78,6 +79,7 @@ export default function QuizScreen() {
   const [hasChecked, setHasChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const { addProgress } = useProgress();
 
   const questions = useMemo(() => {
     if (selectedTopic === 'all') return allQuestions;
@@ -102,6 +104,10 @@ export default function QuizScreen() {
       }
     } else {
       if (currentQuestionIndex === questions.length - 1) {
+        const pct = Math.round((score / questions.length) * 100);
+        if (pct >= 50) addProgress(5);
+        else if (pct > 0) addProgress(2);
+        
         setShowResult(true);
       } else {
         setCurrentQuestionIndex(i => i + 1);

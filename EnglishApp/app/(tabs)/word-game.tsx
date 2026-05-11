@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState, useRef, useEffect } from 'react';
 import Data from '../../constants/merged.json';
 import { useMistakes } from '@/context/MistakesContext';
+import { useProgress } from '@/context/ProgressContext';
 
 type GameMode = 'en-tr' | 'tr-en' | 'scramble' | 'flashcard';
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -87,6 +88,7 @@ function generateQuestions(mode: GameMode, difficulty: Difficulty, count: number
 
 export default function WordGameScreen() {
   const { addMistake } = useMistakes();
+  const { addProgress } = useProgress();
   
   const [phase, setPhase] = useState<GamePhase>('setup');
   const [mode, setMode] = useState<GameMode>('en-tr');
@@ -137,6 +139,10 @@ export default function WordGameScreen() {
 
   const handleNext = () => {
     if (currentIndex === questions.length - 1) {
+      const pct = Math.round((score / questions.length) * 100);
+      if (pct >= 50) addProgress(5);
+      else if (pct > 0) addProgress(2);
+      
       fadeAnim.setValue(0);
       setPhase('result');
     } else {

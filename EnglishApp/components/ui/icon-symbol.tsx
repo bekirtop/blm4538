@@ -22,6 +22,7 @@ const MAPPING = {
   'clock.fill': 'schedule',
   'text.book.closed.fill': 'library-books',
   'brain.head.profile': 'psychology',
+  'gamecontroller.fill': 'sports-esports',
 } as IconMapping;
 
 /**
