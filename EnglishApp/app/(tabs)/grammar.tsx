@@ -10,7 +10,9 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const filters = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+// ─────────────────────────── GRAMMAR DATA ───────────────────────────
+
+const grammarFilters = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 
 interface GrammarTopic {
   id: string;
@@ -26,7 +28,7 @@ interface GrammarTopic {
   quiz: { question: string; options: string[]; correctIndex: number };
 }
 
-const topics: GrammarTopic[] = [
+const grammarTopics: GrammarTopic[] = [
   {
     id: '1',
     title: 'Articles',
@@ -355,15 +357,272 @@ const topics: GrammarTopic[] = [
   },
 ];
 
+// ─────────────────────────── TENSES DATA ───────────────────────────
+
+type TenseGroup = 'All' | 'Present' | 'Past' | 'Future';
+
+interface TenseData {
+  id: string;
+  group: TenseGroup;
+  name: string;
+  trName: string;
+  usage: string;
+  formula: string;
+  negative: string;
+  question: string;
+  examples: { en: string; tr: string }[];
+  signalWords: string[];
+  color: string;
+  icon: string;
+  quiz: { question: string; options: string[]; correctIndex: number };
+}
+
+const tensesData: TenseData[] = [
+  {
+    id: 't1',
+    group: 'Present',
+    name: 'Simple Present',
+    trName: 'Geniş Zaman',
+    usage: 'Genel geçer doğruları, alışkanlıkları, rutinleri ve kalıcı durumları ifade eder. Bilimsel gerçekler için de kullanılır.',
+    formula: 'S + V1(s/es) + Object',
+    negative: 'S + do/does not + V1 + Object',
+    question: 'Do/Does + S + V1 + Object?',
+    examples: [
+      { en: 'I wake up at 7 AM every day.', tr: 'Her gün sabah 7\'de uyanırım.' },
+      { en: 'She speaks three languages fluently.', tr: 'O üç dili akıcı şekilde konuşur.' },
+      { en: 'Water boils at 100 degrees Celsius.', tr: 'Su 100 derecede kaynar.' },
+    ],
+    signalWords: ['always', 'usually', 'often', 'sometimes', 'never', 'every day', 'on Mondays', 'generally'],
+    color: '#3B82F6',
+    icon: 'sunny',
+    quiz: {
+      question: 'Hangi cümle doğru Simple Present\'tır?',
+      options: [
+        'She go to school every day.',
+        'She goes to school every day.',
+        'She is going to school every day.',
+        'She went to school every day.',
+      ],
+      correctIndex: 1,
+    },
+  },
+  {
+    id: 't2',
+    group: 'Present',
+    name: 'Present Continuous',
+    trName: 'Şimdiki Zaman',
+    usage: 'Şu anda devam eden eylemler, geçici durumlar ve planlanmış yakın gelecek için kullanılır.',
+    formula: 'S + am/is/are + V-ing + Object',
+    negative: 'S + am/is/are + not + V-ing + Object',
+    question: 'Am/Is/Are + S + V-ing + Object?',
+    examples: [
+      { en: 'I am reading a book right now.', tr: 'Şu an bir kitap okuyorum.' },
+      { en: 'They are playing football at the park.', tr: 'Parkta futbol oynuyorlar.' },
+      { en: 'She is meeting her boss tomorrow morning.', tr: 'Yarın sabah patronuyla görüşüyor.' },
+    ],
+    signalWords: ['now', 'right now', 'at the moment', 'currently', 'today', 'this week', 'look!', 'listen!'],
+    color: '#10B981',
+    icon: 'time',
+    quiz: {
+      question: '"He ___ a movie right now." Boşluğu doldurun.',
+      options: ['watches', 'watch', 'is watching', 'watched'],
+      correctIndex: 2,
+    },
+  },
+  {
+    id: 't3',
+    group: 'Present',
+    name: 'Present Perfect',
+    trName: 'Yakın Geçmiş Zaman',
+    usage: 'Geçmişte olmuş ama etkisi şu an devam eden olaylar, hayat deneyimleri ve yakın zamanda tamamlanan eylemler.',
+    formula: 'S + have/has + V3 (past participle) + Object',
+    negative: 'S + have/has + not + V3 + Object',
+    question: 'Have/Has + S + V3 + Object?',
+    examples: [
+      { en: 'I have just finished my homework.', tr: 'Az önce ödevimi bitirdim.' },
+      { en: 'She has never been to Paris.', tr: 'O hiç Paris\'e gitmemiş.' },
+      { en: 'Have you ever tried sushi?', tr: 'Hiç sushi denedin mi?' },
+    ],
+    signalWords: ['just', 'already', 'yet', 'ever', 'never', 'recently', 'since', 'for', 'so far', 'lately'],
+    color: '#EC4899',
+    icon: 'checkmark-done',
+    quiz: {
+      question: '"She ___ just ___ the report." (finish)',
+      options: ['has / finished', 'have / finished', 'had / finished', 'is / finishing'],
+      correctIndex: 0,
+    },
+  },
+  {
+    id: 't4',
+    group: 'Present',
+    name: 'Present Perfect Continuous',
+    trName: 'Yakın Geçmişte Sürmekte Olan',
+    usage: 'Geçmişte başlayan ve hala devam eden süregelen eylemleri anlatır. Yorgunluk veya görünür bir sonucu vurgular.',
+    formula: 'S + have/has + been + V-ing + Object',
+    negative: 'S + have/has + not + been + V-ing + Object',
+    question: 'Have/Has + S + been + V-ing + Object?',
+    examples: [
+      { en: 'I have been studying English for 3 years.', tr: '3 yıldır İngilizce çalışıyorum.' },
+      { en: 'She has been waiting since this morning.', tr: 'Bu sabahtan beri bekliyor.' },
+      { en: 'How long have you been learning to drive?', tr: 'Ne zamandır araba kullanmayı öğreniyorsun?' },
+    ],
+    signalWords: ['for', 'since', 'how long', 'all day', 'all morning', 'lately', 'recently'],
+    color: '#0EA5E9',
+    icon: 'hourglass',
+    quiz: {
+      question: '"They ___ been practicing for 2 hours."',
+      options: ['has', 'have', 'had', 'are'],
+      correctIndex: 1,
+    },
+  },
+  {
+    id: 't5',
+    group: 'Past',
+    name: 'Simple Past',
+    trName: 'Geçmiş Zaman',
+    usage: 'Geçmişte belirli bir zamanda başlamış ve tamamen bitmiş eylemleri ifade eder.',
+    formula: 'S + V2 (past form) + Object',
+    negative: 'S + did not (didn\'t) + V1 + Object',
+    question: 'Did + S + V1 + Object?',
+    examples: [
+      { en: 'She visited her grandmother yesterday.', tr: 'Dün büyükannesini ziyaret etti.' },
+      { en: 'We went to Rome last summer.', tr: 'Geçen yaz Roma\'ya gittik.' },
+      { en: 'I didn\'t watch TV last night.', tr: 'Dün gece TV izlemedim.' },
+    ],
+    signalWords: ['yesterday', 'last week/year', '... ago', 'in 2020', 'when I was young', 'in those days'],
+    color: '#F59E0B',
+    icon: 'play-back',
+    quiz: {
+      question: '"I ___ pizza for dinner yesterday."',
+      options: ['eat', 'eating', 'ate', 'have eaten'],
+      correctIndex: 2,
+    },
+  },
+  {
+    id: 't6',
+    group: 'Past',
+    name: 'Past Continuous',
+    trName: 'Geçmişte Süren Zaman',
+    usage: 'Geçmişte belirli bir anda devam etmekte olan eylemleri anlatır. Genelde Simple Past ile "while/when" bağlacıyla kullanılır.',
+    formula: 'S + was/were + V-ing + Object',
+    negative: 'S + was/were + not + V-ing + Object',
+    question: 'Was/Were + S + V-ing + Object?',
+    examples: [
+      { en: 'I was watching TV when he called.', tr: 'O aradığında TV izliyordum.' },
+      { en: 'They were sleeping when the storm started.', tr: 'Fırtına başladığında uyuyorlardı.' },
+      { en: 'What were you doing at 8 PM last night?', tr: 'Dün gece saat 20\'de ne yapıyordun?' },
+    ],
+    signalWords: ['while', 'when', 'at that moment', 'at 5 PM yesterday', 'all morning', 'all evening'],
+    color: '#14B8A6',
+    icon: 'film',
+    quiz: {
+      question: '"I ___ studying when she arrived."',
+      options: ['am', 'was', 'were', 'had'],
+      correctIndex: 1,
+    },
+  },
+  {
+    id: 't7',
+    group: 'Past',
+    name: 'Past Perfect',
+    trName: 'Geçmişte Önce Olan',
+    usage: 'Geçmişteki iki olaydan birinin diğerinden önce gerçekleştiğini gösterir. "Geçmişin geçmişi" olarak düşünülebilir.',
+    formula: 'S + had + V3 (past participle) + Object',
+    negative: 'S + had not (hadn\'t) + V3 + Object',
+    question: 'Had + S + V3 + Object?',
+    examples: [
+      { en: 'She had left before I arrived.', tr: 'Ben varmadan önce o gitmişti.' },
+      { en: 'When he called, I had already eaten.', tr: 'O aradığında ben çoktan yemiştim.' },
+      { en: 'Had you ever seen snow before moving to Canada?', tr: 'Kanada\'ya taşınmadan önce hiç kar görmüş müydün?' },
+    ],
+    signalWords: ['before', 'after', 'already', 'by the time', 'when', 'just', 'never...before'],
+    color: '#7C3AED',
+    icon: 'arrow-undo',
+    quiz: {
+      question: '"When I arrived, she ___ already ___." (leave)',
+      options: ['has / left', 'have / left', 'had / left', 'was / leaving'],
+      correctIndex: 2,
+    },
+  },
+  {
+    id: 't8',
+    group: 'Future',
+    name: 'Future Simple (Will)',
+    trName: 'Gelecek Zaman',
+    usage: 'Tahminler, anlık kararlar, sözler, teklifler ve gelecekle ilgili genel ifadeler için kullanılır.',
+    formula: 'S + will + V1 + Object',
+    negative: 'S + will not (won\'t) + V1 + Object',
+    question: 'Will + S + V1 + Object?',
+    examples: [
+      { en: 'I will call you tomorrow morning.', tr: 'Seni yarın sabah arayacağım.' },
+      { en: 'It will probably rain tonight.', tr: 'Bu gece muhtemelen yağmur yağacak.' },
+      { en: 'Will you help me move this weekend?', tr: 'Bu hafta sonu taşınmamda yardım eder misin?' },
+    ],
+    signalWords: ['tomorrow', 'next week/year', 'soon', 'in the future', 'probably', 'I think', 'I\'m sure', 'I believe'],
+    color: '#8B5CF6',
+    icon: 'rocket',
+    quiz: {
+      question: '"She ___ go to the gym tomorrow."',
+      options: ['wills', 'willing', 'will', 'would'],
+      correctIndex: 2,
+    },
+  },
+  {
+    id: 't9',
+    group: 'Future',
+    name: 'Future Continuous',
+    trName: 'Gelecekte Süren Zaman',
+    usage: 'Gelecekte belirli bir anda devam ediyor olacak eylemleri ifade eder.',
+    formula: 'S + will be + V-ing + Object',
+    negative: 'S + will not be + V-ing + Object',
+    question: 'Will + S + be + V-ing + Object?',
+    examples: [
+      { en: 'At 8 PM tonight, I will be watching the match.', tr: 'Bu gece saat 20\'de maçı izliyor olacağım.' },
+      { en: 'This time tomorrow, she will be flying to London.', tr: 'Yarın bu saatte Londra\'ya uçuyor olacak.' },
+      { en: 'Will you be working on Saturday evening?', tr: 'Cumartesi akşamı çalışıyor olacak mısın?' },
+    ],
+    signalWords: ['at this time tomorrow', 'this time next week', 'at ... o\'clock tomorrow', 'when you arrive'],
+    color: '#F97316',
+    icon: 'refresh',
+    quiz: {
+      question: '"She ___ ___ at this time tomorrow." (work)',
+      options: ['will works', 'will be working', 'will worked', 'is working'],
+      correctIndex: 1,
+    },
+  },
+];
+
+const TENSE_GROUP_FILTERS: TenseGroup[] = ['All', 'Present', 'Past', 'Future'];
+const TENSE_GROUP_COLORS: Record<TenseGroup, string> = {
+  All: '#64748B',
+  Present: '#10B981',
+  Past: '#F59E0B',
+  Future: '#8B5CF6',
+};
+
+// ─────────────────────────── COMPONENT ───────────────────────────
+
+type ActiveTab = 'grammar' | 'tenses';
+
 export default function GrammarScreen() {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('grammar');
+
+  // Grammar state
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedGrammarId, setExpandedGrammarId] = useState<string | null>(null);
   const [exploredIds, setExploredIds] = useState<Set<string>>(new Set());
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
-  const [showQuiz, setShowQuiz] = useState<Record<string, boolean>>({});
+  const [grammarQuizAnswers, setGrammarQuizAnswers] = useState<Record<string, number>>({});
+  const [grammarShowQuiz, setGrammarShowQuiz] = useState<Record<string, boolean>>({});
 
-  const filteredTopics = topics.filter(topic => {
+  // Tenses state
+  const [expandedTenseId, setExpandedTenseId] = useState<string | null>(null);
+  const [activeTenseGroup, setActiveTenseGroup] = useState<TenseGroup>('All');
+  const [tenseQuizAnswers, setTenseQuizAnswers] = useState<Record<string, number>>({});
+  const [tenseShowQuiz, setTenseShowQuiz] = useState<Record<string, boolean>>({});
+
+  // ── Grammar helpers ──
+  const filteredTopics = grammarTopics.filter(topic => {
     const matchesSearch =
       topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       topic.subtitle.toLowerCase().includes(searchQuery.toLowerCase());
@@ -371,267 +630,517 @@ export default function GrammarScreen() {
     return matchesSearch && matchesFilter;
   });
 
-  const toggleExpand = (id: string) => {
+  const toggleGrammarExpand = (id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandedId(prev => (prev === id ? null : id));
+    setExpandedGrammarId(prev => (prev === id ? null : id));
     setExploredIds(prev => new Set([...prev, id]));
   };
 
-  const handleQuizAnswer = (topicId: string, selectedIndex: number) => {
-    if (quizAnswers[topicId] === undefined) {
-      setQuizAnswers(prev => ({ ...prev, [topicId]: selectedIndex }));
+  const handleGrammarQuizAnswer = (topicId: string, selectedIndex: number) => {
+    if (grammarQuizAnswers[topicId] === undefined) {
+      setGrammarQuizAnswers(prev => ({ ...prev, [topicId]: selectedIndex }));
     }
   };
 
-  const toggleQuiz = (topicId: string) => {
+  const toggleGrammarQuiz = (topicId: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowQuiz(prev => ({ ...prev, [topicId]: !prev[topicId] }));
-    setQuizAnswers(prev => { const n = { ...prev }; delete n[topicId]; return n; });
+    setGrammarShowQuiz(prev => ({ ...prev, [topicId]: !prev[topicId] }));
+    setGrammarQuizAnswers(prev => { const n = { ...prev }; delete n[topicId]; return n; });
   };
 
-  const retryQuiz = (topicId: string) => {
-    setQuizAnswers(prev => { const n = { ...prev }; delete n[topicId]; return n; });
+  const retryGrammarQuiz = (topicId: string) => {
+    setGrammarQuizAnswers(prev => { const n = { ...prev }; delete n[topicId]; return n; });
+  };
+
+  // ── Tenses helpers ──
+  const filteredTenses = tensesData.filter(t => activeTenseGroup === 'All' || t.group === activeTenseGroup);
+
+  const toggleTenseExpand = (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedTenseId(expandedTenseId === id ? null : id);
+  };
+
+  const handleTenseQuizAnswer = (tenseId: string, selectedIndex: number) => {
+    if (tenseQuizAnswers[tenseId] === undefined) {
+      setTenseQuizAnswers(prev => ({ ...prev, [tenseId]: selectedIndex }));
+    }
+  };
+
+  const toggleTenseQuiz = (tenseId: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setTenseShowQuiz(prev => ({ ...prev, [tenseId]: !prev[tenseId] }));
+    setTenseQuizAnswers(prev => { const n = { ...prev }; delete n[tenseId]; return n; });
+  };
+
+  const retryTenseQuiz = (tenseId: string) => {
+    setTenseQuizAnswers(prev => { const n = { ...prev }; delete n[tenseId]; return n; });
   };
 
   const exploredCount = exploredIds.size;
-  const totalCount = topics.length;
+  const totalCount = grammarTopics.length;
   const progress = exploredCount / totalCount;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.headerTitle}>Grammar Rules</Text>
-
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>Keşfedilen Konular</Text>
-            <Text style={styles.progressCount}>{exploredCount}/{totalCount}</Text>
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
-          </View>
+        {/* ── Tab Switcher ── */}
+        <View style={styles.tabSwitcher}>
+          <TouchableOpacity
+            style={[styles.tabBtn, activeTab === 'grammar' && styles.tabBtnActive]}
+            onPress={() => setActiveTab('grammar')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="book-outline" size={16} color={activeTab === 'grammar' ? '#fff' : '#64748B'} />
+            <Text style={[styles.tabBtnText, activeTab === 'grammar' && styles.tabBtnTextActive]}>Grammar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabBtn, activeTab === 'tenses' && styles.tabBtnActive]}
+            onPress={() => setActiveTab('tenses')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="time-outline" size={16} color={activeTab === 'tenses' ? '#fff' : '#64748B'} />
+            <Text style={[styles.tabBtnText, activeTab === 'tenses' && styles.tabBtnTextActive]}>Tenses</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#94A3B8" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Konu ara..."
-            placeholderTextColor="#94A3B8"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color="#94A3B8" />
-            </TouchableOpacity>
-          )}
-        </View>
+        {/* ══════════════ GRAMMAR TAB ══════════════ */}
+        {activeTab === 'grammar' && (
+          <>
+            <Text style={styles.headerTitle}>Grammar Rules</Text>
 
-        {/* Filters */}
-        <View style={styles.filterContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-            {filters.map((filter) => (
-              <TouchableOpacity
-                key={filter}
-                style={[styles.filterPill, activeFilter === filter && styles.filterPillActive]}
-                onPress={() => setActiveFilter(filter)}
-              >
-                <Text style={[styles.filterText, activeFilter === filter && styles.filterTextActive]}>
-                  {filter}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+            <View style={styles.progressContainer}>
+              <View style={styles.progressHeader}>
+                <Text style={styles.progressLabel}>Keşfedilen Konular</Text>
+                <Text style={styles.progressCount}>{exploredCount}/{totalCount}</Text>
+              </View>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
+              </View>
+            </View>
 
-        {/* Topics List */}
-        <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
-          {filteredTopics.length > 0 ? (
-            filteredTopics.map((topic) => {
-              const isExpanded = expandedId === topic.id;
-              const isExplored = exploredIds.has(topic.id);
-              const quizShown = !!showQuiz[topic.id];
-              const selectedAnswer = quizAnswers[topic.id];
-              const answered = selectedAnswer !== undefined;
-              const isCorrect = answered && selectedAnswer === topic.quiz.correctIndex;
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#94A3B8" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Konu ara..."
+                placeholderTextColor="#94A3B8"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Ionicons name="close-circle" size={18} color="#94A3B8" />
+                </TouchableOpacity>
+              )}
+            </View>
 
-              return (
-                <View key={topic.id}>
+            <View style={styles.filterContainer}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+                {grammarFilters.map((filter) => (
                   <TouchableOpacity
-                    style={[styles.topicCard, isExpanded && styles.topicCardExpanded]}
-                    onPress={() => toggleExpand(topic.id)}
-                    activeOpacity={0.7}
+                    key={filter}
+                    style={[styles.filterPill, activeFilter === filter && styles.filterPillActive]}
+                    onPress={() => setActiveFilter(filter)}
                   >
-                    <View style={styles.topicHeader}>
-                      <Text style={styles.topicTitle}>{topic.title}</Text>
-                      <View style={styles.topicBadges}>
-                        {isExplored && (
-                          <Ionicons name="checkmark-circle" size={16} color="#10B981" style={{ marginRight: 6 }} />
-                        )}
-                        <View style={[styles.levelBadge, { backgroundColor: topic.levelColor + '20' }]}>
-                          <View style={[styles.levelDot, { backgroundColor: topic.levelColor }]} />
-                          <Text style={[styles.topicLevel, { color: topic.levelColor }]}>{topic.level}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <Text style={styles.topicSubtitle}>{topic.subtitle}</Text>
-                    <Ionicons
-                      name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                      size={20}
-                      color="#CBD5E1"
-                      style={styles.chevron}
-                    />
+                    <Text style={[styles.filterText, activeFilter === filter && styles.filterTextActive]}>
+                      {filter}
+                    </Text>
                   </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
 
-                  {isExpanded && (
-                    <View style={styles.detailContainer}>
-                      {/* Description */}
-                      <Text style={styles.detailDescription}>{topic.description}</Text>
+            <ScrollView style={styles.listContainer} showsVerticalScrollIndicator={false}>
+              {filteredTopics.length > 0 ? (
+                filteredTopics.map((topic) => {
+                  const isExpanded = expandedGrammarId === topic.id;
+                  const isExplored = exploredIds.has(topic.id);
+                  const quizShown = !!grammarShowQuiz[topic.id];
+                  const selectedAnswer = grammarQuizAnswers[topic.id];
+                  const answered = selectedAnswer !== undefined;
+                  const isCorrect = answered && selectedAnswer === topic.quiz.correctIndex;
 
-                      {/* Rules */}
-                      <View style={styles.detailSection}>
-                        <View style={styles.detailSectionHeader}>
-                          <Ionicons name="list-circle" size={20} color="#2EBC9D" />
-                          <Text style={styles.detailSectionTitle}>Kurallar</Text>
-                        </View>
-                        {topic.rules.map((rule, i) => (
-                          <View key={i} style={styles.ruleRow}>
-                            <Text style={styles.ruleBullet}>•</Text>
-                            <Text style={styles.ruleText}>{rule}</Text>
-                          </View>
-                        ))}
-                      </View>
-
-                      {/* Examples */}
-                      <View style={styles.detailSection}>
-                        <View style={styles.detailSectionHeader}>
-                          <Ionicons name="chatbubble-ellipses" size={18} color="#0284C7" />
-                          <Text style={styles.detailSectionTitle}>Örnekler</Text>
-                        </View>
-                        {topic.examples.map((ex, i) => (
-                          <View key={i} style={styles.exampleCard}>
-                            <Text style={styles.exampleText}>{ex}</Text>
-                          </View>
-                        ))}
-                      </View>
-
-                      {/* Suffixes */}
-                      {topic.suffixes && topic.suffixes.length > 0 && (
-                        <View style={styles.detailSection}>
-                          <View style={styles.detailSectionHeader}>
-                            <Ionicons name="extension-puzzle" size={18} color="#7C3AED" />
-                            <Text style={styles.detailSectionTitle}>Ekler (Suffixes)</Text>
-                          </View>
-                          {topic.suffixes.map((s, i) => (
-                            <View key={i} style={styles.suffixCard}>
-                              <View style={styles.suffixHeader}>
-                                <Text style={styles.suffixName}>{s.suffix}</Text>
-                                <Text style={styles.suffixUsage}>{s.usage}</Text>
-                              </View>
-                              <Text style={styles.suffixExample}>Örnek: {s.example}</Text>
+                  return (
+                    <View key={topic.id}>
+                      <TouchableOpacity
+                        style={[styles.topicCard, isExpanded && styles.topicCardExpanded]}
+                        onPress={() => toggleGrammarExpand(topic.id)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.topicHeader}>
+                          <Text style={styles.topicTitle}>{topic.title}</Text>
+                          <View style={styles.topicBadges}>
+                            {isExplored && (
+                              <Ionicons name="checkmark-circle" size={16} color="#10B981" style={{ marginRight: 6 }} />
+                            )}
+                            <View style={[styles.levelBadge, { backgroundColor: topic.levelColor + '20' }]}>
+                              <View style={[styles.levelDot, { backgroundColor: topic.levelColor }]} />
+                              <Text style={[styles.topicLevel, { color: topic.levelColor }]}>{topic.level}</Text>
                             </View>
-                          ))}
+                          </View>
                         </View>
-                      )}
+                        <Text style={styles.topicSubtitle}>{topic.subtitle}</Text>
+                        <Ionicons
+                          name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                          size={20}
+                          color="#CBD5E1"
+                          style={styles.chevron}
+                        />
+                      </TouchableOpacity>
 
-                      {/* Tip */}
-                      <View style={styles.tipCard}>
-                        <Ionicons name="bulb" size={18} color="#D97706" />
-                        <Text style={styles.tipText}>{topic.tip}</Text>
-                      </View>
+                      {isExpanded && (
+                        <View style={styles.detailContainer}>
+                          <Text style={styles.detailDescription}>{topic.description}</Text>
 
-                      {/* Quiz */}
-                      <View style={styles.detailSection}>
-                        <TouchableOpacity
-                          style={[styles.quizToggleBtn, { borderColor: topic.levelColor }]}
-                          onPress={() => toggleQuiz(topic.id)}
-                          activeOpacity={0.8}
-                        >
-                          <Ionicons
-                            name={quizShown ? 'close-circle-outline' : 'help-circle-outline'}
-                            size={18}
-                            color={topic.levelColor}
-                          />
-                          <Text style={[styles.quizToggleBtnText, { color: topic.levelColor }]}>
-                            {quizShown ? 'Quiz\'i Kapat' : 'Quiz Sorusunu Gör'}
-                          </Text>
-                        </TouchableOpacity>
+                          <View style={styles.detailSection}>
+                            <View style={styles.detailSectionHeader}>
+                              <Ionicons name="list-circle" size={20} color="#2EBC9D" />
+                              <Text style={styles.detailSectionTitle}>Kurallar</Text>
+                            </View>
+                            {topic.rules.map((rule, i) => (
+                              <View key={i} style={styles.ruleRow}>
+                                <Text style={styles.ruleBullet}>•</Text>
+                                <Text style={styles.ruleText}>{rule}</Text>
+                              </View>
+                            ))}
+                          </View>
 
-                        {quizShown && (
-                          <View style={styles.quizContainer}>
-                            <Text style={styles.quizQuestion}>{topic.quiz.question}</Text>
-                            {topic.quiz.options.map((option, i) => {
-                              const isThisCorrect = i === topic.quiz.correctIndex;
-                              const isThisSelected = i === selectedAnswer;
-                              return (
-                                <TouchableOpacity
-                                  key={i}
-                                  style={[
-                                    styles.quizOption,
-                                    answered && isThisCorrect && styles.quizOptionCorrect,
-                                    answered && isThisSelected && !isThisCorrect && styles.quizOptionWrong,
-                                  ]}
-                                  onPress={() => handleQuizAnswer(topic.id, i)}
-                                  disabled={answered}
-                                  activeOpacity={0.7}
-                                >
-                                  <View style={[
-                                    styles.optionLetterBox,
-                                    answered && isThisCorrect && { backgroundColor: '#10B981' },
-                                    answered && isThisSelected && !isThisCorrect && { backgroundColor: '#EF4444' },
-                                  ]}>
-                                    <Text style={styles.optionLetter}>{String.fromCharCode(65 + i)}</Text>
+                          <View style={styles.detailSection}>
+                            <View style={styles.detailSectionHeader}>
+                              <Ionicons name="chatbubble-ellipses" size={18} color="#0284C7" />
+                              <Text style={styles.detailSectionTitle}>Örnekler</Text>
+                            </View>
+                            {topic.examples.map((ex, i) => (
+                              <View key={i} style={styles.exampleCard}>
+                                <Text style={styles.exampleText}>{ex}</Text>
+                              </View>
+                            ))}
+                          </View>
+
+                          {topic.suffixes && topic.suffixes.length > 0 && (
+                            <View style={styles.detailSection}>
+                              <View style={styles.detailSectionHeader}>
+                                <Ionicons name="extension-puzzle" size={18} color="#7C3AED" />
+                                <Text style={styles.detailSectionTitle}>Ekler (Suffixes)</Text>
+                              </View>
+                              {topic.suffixes.map((s, i) => (
+                                <View key={i} style={styles.suffixCard}>
+                                  <View style={styles.suffixHeader}>
+                                    <Text style={styles.suffixName}>{s.suffix}</Text>
+                                    <Text style={styles.suffixUsage}>{s.usage}</Text>
                                   </View>
-                                  <Text style={[
-                                    styles.quizOptionText,
-                                    answered && isThisCorrect && styles.quizOptionTextCorrect,
-                                    answered && isThisSelected && !isThisCorrect && styles.quizOptionTextWrong,
-                                  ]}>
-                                    {option}
-                                  </Text>
-                                  {answered && isThisCorrect && (
-                                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
-                                  )}
-                                  {answered && isThisSelected && !isThisCorrect && (
-                                    <Ionicons name="close-circle" size={18} color="#EF4444" />
-                                  )}
-                                </TouchableOpacity>
-                              );
-                            })}
+                                  <Text style={styles.suffixExample}>Örnek: {s.example}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          )}
 
-                            {answered && (
-                              <View style={[styles.feedbackBox, { backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2' }]}>
-                                <Ionicons
-                                  name={isCorrect ? 'trophy' : 'refresh-circle'}
-                                  size={22}
-                                  color={isCorrect ? '#16A34A' : '#DC2626'}
-                                />
-                                <Text style={[styles.feedbackText, { color: isCorrect ? '#16A34A' : '#DC2626' }]}>
-                                  {isCorrect ? 'Harika! Doğru cevap!' : 'Yanlış, tekrar dene!'}
-                                </Text>
-                                {!isCorrect && (
-                                  <TouchableOpacity onPress={() => retryQuiz(topic.id)} style={styles.retryBtn}>
-                                    <Text style={styles.retryText}>Tekrar</Text>
-                                  </TouchableOpacity>
+                          <View style={styles.tipCard}>
+                            <Ionicons name="bulb" size={18} color="#D97706" />
+                            <Text style={styles.tipText}>{topic.tip}</Text>
+                          </View>
+
+                          <View style={styles.detailSection}>
+                            <TouchableOpacity
+                              style={[styles.quizToggleBtn, { borderColor: topic.levelColor }]}
+                              onPress={() => toggleGrammarQuiz(topic.id)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons
+                                name={quizShown ? 'close-circle-outline' : 'help-circle-outline'}
+                                size={18}
+                                color={topic.levelColor}
+                              />
+                              <Text style={[styles.quizToggleBtnText, { color: topic.levelColor }]}>
+                                {quizShown ? 'Quiz\'i Kapat' : 'Quiz Sorusunu Gör'}
+                              </Text>
+                            </TouchableOpacity>
+
+                            {quizShown && (
+                              <View style={styles.quizContainer}>
+                                <Text style={styles.quizQuestion}>{topic.quiz.question}</Text>
+                                {topic.quiz.options.map((option, i) => {
+                                  const isThisCorrect = i === topic.quiz.correctIndex;
+                                  const isThisSelected = i === selectedAnswer;
+                                  return (
+                                    <TouchableOpacity
+                                      key={i}
+                                      style={[
+                                        styles.quizOption,
+                                        answered && isThisCorrect && styles.quizOptionCorrect,
+                                        answered && isThisSelected && !isThisCorrect && styles.quizOptionWrong,
+                                      ]}
+                                      onPress={() => handleGrammarQuizAnswer(topic.id, i)}
+                                      disabled={answered}
+                                      activeOpacity={0.7}
+                                    >
+                                      <View style={[
+                                        styles.optionLetterBox,
+                                        answered && isThisCorrect && { backgroundColor: '#10B981' },
+                                        answered && isThisSelected && !isThisCorrect && { backgroundColor: '#EF4444' },
+                                      ]}>
+                                        <Text style={styles.optionLetter}>{String.fromCharCode(65 + i)}</Text>
+                                      </View>
+                                      <Text style={[
+                                        styles.quizOptionText,
+                                        answered && isThisCorrect && styles.quizOptionTextCorrect,
+                                        answered && isThisSelected && !isThisCorrect && styles.quizOptionTextWrong,
+                                      ]}>
+                                        {option}
+                                      </Text>
+                                      {answered && isThisCorrect && (
+                                        <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                                      )}
+                                      {answered && isThisSelected && !isThisCorrect && (
+                                        <Ionicons name="close-circle" size={18} color="#EF4444" />
+                                      )}
+                                    </TouchableOpacity>
+                                  );
+                                })}
+
+                                {answered && (
+                                  <View style={[styles.feedbackBox, { backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2' }]}>
+                                    <Ionicons
+                                      name={isCorrect ? 'trophy' : 'refresh-circle'}
+                                      size={22}
+                                      color={isCorrect ? '#16A34A' : '#DC2626'}
+                                    />
+                                    <Text style={[styles.feedbackText, { color: isCorrect ? '#16A34A' : '#DC2626' }]}>
+                                      {isCorrect ? 'Harika! Doğru cevap!' : 'Yanlış, tekrar dene!'}
+                                    </Text>
+                                    {!isCorrect && (
+                                      <TouchableOpacity onPress={() => retryGrammarQuiz(topic.id)} style={styles.retryBtn}>
+                                        <Text style={styles.retryText}>Tekrar</Text>
+                                      </TouchableOpacity>
+                                    )}
+                                  </View>
                                 )}
                               </View>
                             )}
                           </View>
-                        )}
-                      </View>
+                        </View>
+                      )}
                     </View>
-                  )}
-                </View>
-              );
-            })
-          ) : (
-            <Text style={styles.emptyText}>Konu bulunamadı.</Text>
-          )}
-          <View style={{ height: 30 }} />
-        </ScrollView>
+                  );
+                })
+              ) : (
+                <Text style={styles.emptyText}>Konu bulunamadı.</Text>
+              )}
+              <View style={{ height: 30 }} />
+            </ScrollView>
+          </>
+        )}
+
+        {/* ══════════════ TENSES TAB ══════════════ */}
+        {activeTab === 'tenses' && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.tensesHeader}>
+              <Text style={styles.headerTitle}>İngilizce Zamanlar</Text>
+              <Text style={styles.tensesHeaderDesc}>{tensesData.length} Tense · Formüller · Sinyal Kelimeler · Quiz</Text>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.filterWrapper}
+              contentContainerStyle={styles.filterContent}
+            >
+              {TENSE_GROUP_FILTERS.map(group => (
+                <TouchableOpacity
+                  key={group}
+                  style={[styles.tenseFilterPill, activeTenseGroup === group && { backgroundColor: TENSE_GROUP_COLORS[group] }]}
+                  onPress={() => setActiveTenseGroup(group)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.filterText, activeTenseGroup === group && styles.filterTextActive]}>
+                    {group}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <View style={styles.tenseListContainer}>
+              {filteredTenses.map(item => {
+                const isExpanded = expandedTenseId === item.id;
+                const quizShown = !!tenseShowQuiz[item.id];
+                const selectedAnswer = tenseQuizAnswers[item.id];
+                const answered = selectedAnswer !== undefined;
+                const isCorrect = answered && selectedAnswer === item.quiz.correctIndex;
+
+                return (
+                  <View key={item.id}>
+                    <TouchableOpacity
+                      style={[styles.tenseCard, isExpanded && { borderColor: item.color + '60', borderWidth: 2 }]}
+                      onPress={() => toggleTenseExpand(item.id)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.tenseCardHeader}>
+                        <View style={[styles.tenseIconContainer, { backgroundColor: item.color + '20' }]}>
+                          <Ionicons name={item.icon as any} size={24} color={item.color} />
+                        </View>
+                        <View style={styles.tenseTitleContainer}>
+                          <View style={styles.tenseNameLine}>
+                            <Text style={styles.tenseTitle}>{item.name}</Text>
+                            <View style={[styles.tenseGroupBadge, { backgroundColor: item.color + '20' }]}>
+                              <Text style={[styles.tenseGroupBadgeText, { color: item.color }]}>{item.group}</Text>
+                            </View>
+                          </View>
+                          <Text style={styles.tenseSubtitle}>{item.trName}</Text>
+                        </View>
+                        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#94A3B8" />
+                      </View>
+
+                      {isExpanded && (
+                        <View style={styles.tenseExpandedContent}>
+                          <View style={styles.tenseDivider} />
+
+                          <View style={styles.tenseSection}>
+                            <View style={styles.tenseSectionHeader}>
+                              <Ionicons name="information-circle-outline" size={16} color="#64748B" />
+                              <Text style={styles.tenseSectionTitle}>Kullanım</Text>
+                            </View>
+                            <Text style={styles.tenseSectionText}>{item.usage}</Text>
+                          </View>
+
+                          <View style={styles.tenseSection}>
+                            <View style={styles.tenseSectionHeader}>
+                              <Ionicons name="code-slash-outline" size={16} color="#64748B" />
+                              <Text style={styles.tenseSectionTitle}>Formüller</Text>
+                            </View>
+                            <View style={[styles.formulaRow, { borderLeftColor: item.color }]}>
+                              <View style={[styles.formulaBadge, { backgroundColor: item.color }]}>
+                                <Text style={styles.formulaBadgeText}>+</Text>
+                              </View>
+                              <Text style={styles.formulaText}>{item.formula}</Text>
+                            </View>
+                            <View style={[styles.formulaRow, { borderLeftColor: '#EF4444' }]}>
+                              <View style={[styles.formulaBadge, { backgroundColor: '#EF4444' }]}>
+                                <Text style={styles.formulaBadgeText}>-</Text>
+                              </View>
+                              <Text style={styles.formulaText}>{item.negative}</Text>
+                            </View>
+                            <View style={[styles.formulaRow, { borderLeftColor: '#F59E0B' }]}>
+                              <View style={[styles.formulaBadge, { backgroundColor: '#F59E0B' }]}>
+                                <Text style={styles.formulaBadgeText}>?</Text>
+                              </View>
+                              <Text style={styles.formulaText}>{item.question}</Text>
+                            </View>
+                          </View>
+
+                          <View style={styles.tenseSection}>
+                            <View style={styles.tenseSectionHeader}>
+                              <Ionicons name="key-outline" size={16} color="#64748B" />
+                              <Text style={styles.tenseSectionTitle}>Sinyal Kelimeler</Text>
+                            </View>
+                            <View style={styles.chipsContainer}>
+                              {item.signalWords.map((word, i) => (
+                                <View
+                                  key={i}
+                                  style={[styles.chip, { borderColor: item.color + '70', backgroundColor: item.color + '12' }]}
+                                >
+                                  <Text style={[styles.chipText, { color: item.color }]}>{word}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          </View>
+
+                          <View style={styles.tenseSection}>
+                            <View style={styles.tenseSectionHeader}>
+                              <Ionicons name="chatbubbles-outline" size={16} color="#64748B" />
+                              <Text style={styles.tenseSectionTitle}>Örnekler</Text>
+                            </View>
+                            {item.examples.map((ex, i) => (
+                              <View key={i} style={[styles.tenseExampleBox, { borderLeftColor: item.color }]}>
+                                <Text style={styles.tenseExampleEn}>{ex.en}</Text>
+                                <Text style={styles.tenseExampleTr}>{ex.tr}</Text>
+                              </View>
+                            ))}
+                          </View>
+
+                          <View style={styles.tenseSection}>
+                            <TouchableOpacity
+                              style={[styles.tenseQuizToggleBtn, { backgroundColor: item.color }]}
+                              onPress={() => toggleTenseQuiz(item.id)}
+                              activeOpacity={0.8}
+                            >
+                              <Ionicons name={quizShown ? 'close-circle-outline' : 'bulb-outline'} size={18} color="#FFFFFF" />
+                              <Text style={styles.tenseQuizToggleBtnText}>
+                                {quizShown ? 'Quiz\'i Kapat' : 'Quiz Sorusu'}
+                              </Text>
+                            </TouchableOpacity>
+
+                            {quizShown && (
+                              <View style={styles.quizContainer}>
+                                <Text style={styles.quizQuestion}>{item.quiz.question}</Text>
+                                {item.quiz.options.map((option, i) => {
+                                  const isThisCorrect = i === item.quiz.correctIndex;
+                                  const isThisSelected = i === selectedAnswer;
+                                  return (
+                                    <TouchableOpacity
+                                      key={i}
+                                      style={[
+                                        styles.quizOption,
+                                        answered && isThisCorrect && styles.quizOptionCorrect,
+                                        answered && isThisSelected && !isThisCorrect && styles.quizOptionWrong,
+                                      ]}
+                                      onPress={() => handleTenseQuizAnswer(item.id, i)}
+                                      disabled={answered}
+                                      activeOpacity={0.7}
+                                    >
+                                      <View style={[
+                                        styles.optionLetterBox,
+                                        answered && isThisCorrect && { backgroundColor: '#10B981' },
+                                        answered && isThisSelected && !isThisCorrect && { backgroundColor: '#EF4444' },
+                                      ]}>
+                                        <Text style={styles.optionLetter}>{String.fromCharCode(65 + i)}</Text>
+                                      </View>
+                                      <Text style={[
+                                        styles.quizOptionText,
+                                        answered && isThisCorrect && styles.quizOptionTextCorrect,
+                                        answered && isThisSelected && !isThisCorrect && styles.quizOptionTextWrong,
+                                      ]}>
+                                        {option}
+                                      </Text>
+                                      {answered && isThisCorrect && (
+                                        <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                                      )}
+                                      {answered && isThisSelected && !isThisCorrect && (
+                                        <Ionicons name="close-circle" size={18} color="#EF4444" />
+                                      )}
+                                    </TouchableOpacity>
+                                  );
+                                })}
+
+                                {answered && (
+                                  <View style={[styles.feedbackBox, { backgroundColor: isCorrect ? '#DCFCE7' : '#FEE2E2' }]}>
+                                    <Ionicons
+                                      name={isCorrect ? 'trophy' : 'refresh-circle'}
+                                      size={22}
+                                      color={isCorrect ? '#16A34A' : '#DC2626'}
+                                    />
+                                    <Text style={[styles.feedbackText, { color: isCorrect ? '#16A34A' : '#DC2626' }]}>
+                                      {isCorrect ? 'Harika! Doğru cevap!' : 'Yanlış, tekrar dene!'}
+                                    </Text>
+                                    {!isCorrect && (
+                                      <TouchableOpacity onPress={() => retryTenseQuiz(item.id)} style={styles.retryBtn}>
+                                        <Text style={styles.retryText}>Tekrar</Text>
+                                      </TouchableOpacity>
+                                    )}
+                                  </View>
+                                )}
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -640,11 +1149,35 @@ export default function GrammarScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
   container: { flex: 1, backgroundColor: '#FFFFFF' },
+
+  // ── Tab Switcher ──
+  tabSwitcher: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 4,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 14,
+    padding: 4,
+  },
+  tabBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 11,
+  },
+  tabBtnActive: { backgroundColor: '#2EBC9D' },
+  tabBtnText: { fontSize: 14, fontWeight: '700', color: '#64748B' },
+  tabBtnTextActive: { color: '#FFFFFF' },
+
+  // ── Grammar ──
   headerTitle: {
     fontSize: 24, fontWeight: 'bold', color: '#1E293B',
-    paddingHorizontal: 20, marginTop: 20, marginBottom: 12,
+    paddingHorizontal: 20, marginTop: 16, marginBottom: 12,
   },
-
   progressContainer: { marginHorizontal: 20, marginBottom: 16 },
   progressHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   progressLabel: { fontSize: 12, color: '#64748B', fontWeight: '600' },
@@ -750,4 +1283,75 @@ const styles = StyleSheet.create({
   retryText: { fontSize: 13, fontWeight: '700', color: '#FFFFFF' },
 
   emptyText: { textAlign: 'center', marginTop: 40, color: '#94A3B8', fontSize: 16 },
+
+  // ── Tenses ──
+  tensesHeader: { paddingHorizontal: 20, paddingBottom: 8 },
+  tensesHeaderDesc: { fontSize: 14, color: '#64748B', paddingHorizontal: 20, marginBottom: 8 },
+
+  filterWrapper: { marginBottom: 16 },
+  filterContent: { paddingHorizontal: 16, flexDirection: 'row' },
+  tenseFilterPill: {
+    paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20,
+    backgroundColor: '#F1F5F9', marginRight: 8,
+  },
+
+  tenseListContainer: { paddingHorizontal: 16 },
+
+  tenseCard: {
+    backgroundColor: '#FFFFFF', borderRadius: 20, marginBottom: 16, padding: 16,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    borderWidth: 1.5, borderColor: '#F1F5F9',
+  },
+  tenseCardHeader: { flexDirection: 'row', alignItems: 'center' },
+  tenseIconContainer: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  tenseTitleContainer: { flex: 1, marginLeft: 14 },
+  tenseNameLine: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
+  tenseTitle: { fontSize: 16, fontWeight: 'bold', color: '#1E293B' },
+  tenseGroupBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
+  tenseGroupBadgeText: { fontSize: 11, fontWeight: '700' },
+  tenseSubtitle: { fontSize: 13, color: '#94A3B8', marginTop: 2 },
+
+  tenseExpandedContent: { marginTop: 14 },
+  tenseDivider: { height: 1, backgroundColor: '#F1F5F9', marginBottom: 16 },
+
+  tenseSection: { marginBottom: 16 },
+  tenseSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  tenseSectionTitle: {
+    fontSize: 11, fontWeight: '700', color: '#64748B',
+    textTransform: 'uppercase', letterSpacing: 0.8,
+  },
+  tenseSectionText: { fontSize: 14, color: '#334155', lineHeight: 22 },
+
+  formulaRow: {
+    flexDirection: 'row', alignItems: 'center', borderLeftWidth: 3,
+    backgroundColor: '#F8FAFC', borderRadius: 8, paddingVertical: 8,
+    paddingRight: 10, paddingLeft: 10, marginBottom: 6,
+  },
+  formulaBadge: {
+    width: 20, height: 20, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center', marginRight: 10,
+  },
+  formulaBadgeText: { fontSize: 12, fontWeight: 'bold', color: '#FFFFFF' },
+  formulaText: {
+    flex: 1, fontSize: 13, fontWeight: '600', color: '#0F172A',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', lineHeight: 20,
+  },
+
+  chipsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  chip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
+  chipText: { fontSize: 12, fontWeight: '600' },
+
+  tenseExampleBox: {
+    borderLeftWidth: 4, borderRadius: 8, padding: 12, marginBottom: 8,
+    backgroundColor: '#F0FDF4',
+  },
+  tenseExampleEn: { fontSize: 15, fontWeight: '600', color: '#166534', marginBottom: 4 },
+  tenseExampleTr: { fontSize: 13, color: '#15803D', fontStyle: 'italic' },
+
+  tenseQuizToggleBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, paddingVertical: 11, borderRadius: 12,
+  },
+  tenseQuizToggleBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
 });

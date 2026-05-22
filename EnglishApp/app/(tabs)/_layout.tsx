@@ -39,8 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="tenses"
         options={{
-          title: 'Tenses',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.fill" color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen
