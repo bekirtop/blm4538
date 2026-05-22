@@ -11,3 +11,5 @@
 -5. Hafta video: https://youtu.be/02JM3-T005Q
 
 -6. Hafta video: https://youtu.be/B1YfU1bMVp0
+
+-7. Hafta video: https://youtu.be/npmDP2dwtMc
