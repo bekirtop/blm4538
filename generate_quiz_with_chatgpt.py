@@ -5,7 +5,12 @@ Kullanım:
   python generate_quiz_with_chatgpt.py
 
 Çıktı:
-  quiz_questions.json  →  id, topic, question, options, correctAnswer
+  Üretilen sorular doğrudan EnglishApp/constants/quiz_questions.json
+  dosyasına eklenir (uygulama bu dosyayı doğrudan import eder, bkz.
+  EnglishApp/app/(tabs)/quiz.tsx). Var olan sorularla birebir aynı
+  metne sahip sorular atlanır, yeni sorulara mevcut en yüksek id'den
+  devam eden id'ler atanır — yani script'i tekrar çalıştırmak
+  uygulamadaki soru havuzunu kaybetmeden üzerine ekler.
 """
 
 import os
@@ -127,10 +132,36 @@ def generate_questions_for_topic(client: OpenAI, topic: dict, count: int) -> lis
     return questions
 
 
-def assign_ids(all_questions: list) -> list:
-    for i, q in enumerate(all_questions, start=1):
-        q["id"] = i
-    return all_questions
+def normalize_question(text: str) -> str:
+    return " ".join(text.strip().lower().split())
+
+
+def load_existing_questions(path: Path) -> list:
+    if not path.exists():
+        return []
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def merge_questions(existing: list, generated: list) -> tuple[list, int]:
+    """Yeni soruları, aynı metne sahip olanları atlayarak ve id'lerini
+    mevcut en yüksek id'den devam ettirerek mevcut listeye ekler."""
+    seen = {normalize_question(q["question"]) for q in existing}
+    next_id = max((q["id"] for q in existing), default=0) + 1
+
+    merged = list(existing)
+    added = 0
+    for q in generated:
+        key = normalize_question(q["question"])
+        if key in seen:
+            continue
+        seen.add(key)
+        q["id"] = next_id
+        next_id += 1
+        merged.append(q)
+        added += 1
+
+    return merged, added
 
 
 def validate_question(q: dict, topic_key: str) -> bool:
@@ -153,7 +184,7 @@ def main():
         return
 
     client = OpenAI(api_key=API_KEY)
-    all_questions = []
+    generated_questions = []
 
     for topic in TOPICS:
         try:
@@ -166,17 +197,23 @@ def main():
                 else:
                     print(f"    [!] Skipped invalid question: {q.get('question', '')[:60]}")
             print(f"  -> {len(valid)} valid questions saved for '{topic['title']}'")
-            all_questions.extend(valid)
+            generated_questions.extend(valid)
         except Exception as e:
             print(f"  [ERROR] '{topic['title']}': {e}")
 
-    all_questions = assign_ids(all_questions)
+    json_path = Path(__file__).parent / "EnglishApp" / "constants" / "quiz_questions.json"
+    existing_questions = load_existing_questions(json_path)
+    merged_questions, added = merge_questions(existing_questions, generated_questions)
 
-    json_path = Path(__file__).parent / "quiz_questions.json"
     with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(all_questions, f, ensure_ascii=False, indent=2)
-    print(f"\n✓ {json_path} oluşturuldu ({len(all_questions)} soru)")
-    print("Tamamlandı!")
+        json.dump(merged_questions, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+    skipped = len(generated_questions) - added
+    print(f"\n✓ {json_path} güncellendi")
+    print(f"  + {added} yeni soru eklendi, {skipped} tekrar eden soru atlandı")
+    print(f"  Toplam soru sayısı: {len(merged_questions)}")
+    print("Tamamlandı! Uygulamayı yeniden başlattığında yeni sorular Quiz sekmesinde görünecek.")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useMemo } from 'react';
 import { useProgress } from '@/context/ProgressContext';
+import quizQuestionsData from '../../constants/quiz_questions.json';
 
 type QuizPhase = 'topics' | 'playing';
 
@@ -25,91 +26,7 @@ const topicCategories = [
   { key: 'relative', title: 'Relative Clauses', subtitle: 'Who, Which, That', icon: 'link', color: '#4F46E5', bgColor: '#E0E7FF' },
 ];
 
-const allQuestions: Question[] = [
-  // ── TENSES (10) ──
-  { id: 1, topic: 'tenses', question: "She ___ to school every day.", options: [{ id: 'A', text: 'go' }, { id: 'B', text: 'goes' }, { id: 'C', text: 'going' }, { id: 'D', text: 'gone' }], correctAnswer: 'B' },
-  { id: 2, topic: 'tenses', question: "What ___ you doing right now?", options: [{ id: 'A', text: 'were' }, { id: 'B', text: 'have' }, { id: 'C', text: 'are' }, { id: 'D', text: 'do' }], correctAnswer: 'C' },
-  { id: 3, topic: 'tenses', question: "They ___ playing football when it started to rain.", options: [{ id: 'A', text: 'was' }, { id: 'B', text: 'were' }, { id: 'C', text: 'are' }, { id: 'D', text: 'have' }], correctAnswer: 'B' },
-  { id: 4, topic: 'tenses', question: "I ___ already eaten breakfast.", options: [{ id: 'A', text: 'has' }, { id: 'B', text: 'had' }, { id: 'C', text: 'have' }, { id: 'D', text: 'having' }], correctAnswer: 'C' },
-  { id: 5, topic: 'tenses', question: "She ___ to Paris last summer.", options: [{ id: 'A', text: 'goes' }, { id: 'B', text: 'gone' }, { id: 'C', text: 'go' }, { id: 'D', text: 'went' }], correctAnswer: 'D' },
-  { id: 6, topic: 'tenses', question: "He ___ his homework by the time I arrived.", options: [{ id: 'A', text: 'finished' }, { id: 'B', text: 'has finished' }, { id: 'C', text: 'had finished' }, { id: 'D', text: 'finishes' }], correctAnswer: 'C' },
-  { id: 7, topic: 'tenses', question: "This time tomorrow, she ___ flying to London.", options: [{ id: 'A', text: 'is' }, { id: 'B', text: 'will be' }, { id: 'C', text: 'was' }, { id: 'D', text: 'has been' }], correctAnswer: 'B' },
-  { id: 8, topic: 'tenses', question: "I ___ English for three years.", options: [{ id: 'A', text: 'study' }, { id: 'B', text: 'have been studying' }, { id: 'C', text: 'studied' }, { id: 'D', text: 'am studying' }], correctAnswer: 'B' },
-  { id: 9, topic: 'tenses', question: "When I got home, my sister ___ dinner.", options: [{ id: 'A', text: 'cooks' }, { id: 'B', text: 'is cooking' }, { id: 'C', text: 'was cooking' }, { id: 'D', text: 'cooked' }], correctAnswer: 'C' },
-  { id: 10, topic: 'tenses', question: "By next year, I ___ this company for a decade.", options: [{ id: 'A', text: 'work' }, { id: 'B', text: 'will work' }, { id: 'C', text: 'will have worked' }, { id: 'D', text: 'have worked' }], correctAnswer: 'C' },
-
-  // ── ARTICLES (10) ──
-  { id: 11, topic: 'articles', question: "I saw ___ elephant at the zoo.", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'B' },
-  { id: 12, topic: 'articles', question: "___ sun rises in the east.", options: [{ id: 'A', text: 'A' }, { id: 'B', text: 'An' }, { id: 'C', text: 'The' }, { id: 'D', text: '—' }], correctAnswer: 'C' },
-  { id: 13, topic: 'articles', question: "She is ___ honest person.", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'B' },
-  { id: 14, topic: 'articles', question: "I need ___ book from the library.", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: '—' }, { id: 'D', text: 'some' }], correctAnswer: 'A' },
-  { id: 15, topic: 'articles', question: "___ water is essential for life.", options: [{ id: 'A', text: 'A' }, { id: 'B', text: 'An' }, { id: 'C', text: 'The' }, { id: 'D', text: '—' }], correctAnswer: 'D' },
-  { id: 16, topic: 'articles', question: "He is ___ university student.", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'A' },
-  { id: 17, topic: 'articles', question: "Can you close ___ window, please?", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'C' },
-  { id: 18, topic: 'articles', question: "I have ___ idea!", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'A' },
-  { id: 19, topic: 'articles', question: "___ dogs are loyal animals.", options: [{ id: 'A', text: 'A' }, { id: 'B', text: 'An' }, { id: 'C', text: 'The' }, { id: 'D', text: '—' }], correctAnswer: 'D' },
-  { id: 20, topic: 'articles', question: "She plays ___ piano beautifully.", options: [{ id: 'A', text: 'a' }, { id: 'B', text: 'an' }, { id: 'C', text: 'the' }, { id: 'D', text: '—' }], correctAnswer: 'C' },
-
-  // ── PREPOSITIONS (10) ──
-  { id: 21, topic: 'prepositions', question: "She was born ___ 1995.", options: [{ id: 'A', text: 'on' }, { id: 'B', text: 'at' }, { id: 'C', text: 'in' }, { id: 'D', text: 'by' }], correctAnswer: 'C' },
-  { id: 22, topic: 'prepositions', question: "The meeting is ___ Monday.", options: [{ id: 'A', text: 'in' }, { id: 'B', text: 'on' }, { id: 'C', text: 'at' }, { id: 'D', text: 'by' }], correctAnswer: 'B' },
-  { id: 23, topic: 'prepositions', question: "I'll meet you ___ 5 o'clock.", options: [{ id: 'A', text: 'in' }, { id: 'B', text: 'on' }, { id: 'C', text: 'at' }, { id: 'D', text: 'by' }], correctAnswer: 'C' },
-  { id: 24, topic: 'prepositions', question: "The cat is sleeping ___ the table.", options: [{ id: 'A', text: 'over' }, { id: 'B', text: 'in' }, { id: 'C', text: 'at' }, { id: 'D', text: 'under' }], correctAnswer: 'D' },
-  { id: 25, topic: 'prepositions', question: "He came ___ bus.", options: [{ id: 'A', text: 'in' }, { id: 'B', text: 'on' }, { id: 'C', text: 'at' }, { id: 'D', text: 'by' }], correctAnswer: 'D' },
-  { id: 26, topic: 'prepositions', question: "We arrived ___ the airport early.", options: [{ id: 'A', text: 'in' }, { id: 'B', text: 'on' }, { id: 'C', text: 'at' }, { id: 'D', text: 'by' }], correctAnswer: 'C' },
-  { id: 27, topic: 'prepositions', question: "She has lived here ___ 2019.", options: [{ id: 'A', text: 'for' }, { id: 'B', text: 'since' }, { id: 'C', text: 'at' }, { id: 'D', text: 'by' }], correctAnswer: 'B' },
-  { id: 28, topic: 'prepositions', question: "I waited ___ two hours.", options: [{ id: 'A', text: 'since' }, { id: 'B', text: 'for' }, { id: 'C', text: 'at' }, { id: 'D', text: 'on' }], correctAnswer: 'B' },
-  { id: 29, topic: 'prepositions', question: "The keys are ___ the drawer.", options: [{ id: 'A', text: 'on' }, { id: 'B', text: 'at' }, { id: 'C', text: 'in' }, { id: 'D', text: 'by' }], correctAnswer: 'C' },
-  { id: 30, topic: 'prepositions', question: "The restaurant is ___ the corner.", options: [{ id: 'A', text: 'at' }, { id: 'B', text: 'in' }, { id: 'C', text: 'by' }, { id: 'D', text: 'on' }], correctAnswer: 'A' },
-
-  // ── MODALS (10) ──
-  { id: 31, topic: 'modals', question: "You ___ wear a seatbelt while driving.", options: [{ id: 'A', text: 'can' }, { id: 'B', text: 'might' }, { id: 'C', text: 'must' }, { id: 'D', text: 'could' }], correctAnswer: 'C' },
-  { id: 32, topic: 'modals', question: "___ I borrow your pen?", options: [{ id: 'A', text: 'Must' }, { id: 'B', text: 'Should' }, { id: 'C', text: 'May' }, { id: 'D', text: 'Will' }], correctAnswer: 'C' },
-  { id: 33, topic: 'modals', question: "You ___ study harder if you want to pass.", options: [{ id: 'A', text: 'might' }, { id: 'B', text: 'should' }, { id: 'C', text: 'can' }, { id: 'D', text: 'may' }], correctAnswer: 'B' },
-  { id: 34, topic: 'modals', question: "She ___ speak three languages.", options: [{ id: 'A', text: 'must' }, { id: 'B', text: 'should' }, { id: 'C', text: 'can' }, { id: 'D', text: 'may' }], correctAnswer: 'C' },
-  { id: 35, topic: 'modals', question: "You ___ smoke here. It's forbidden.", options: [{ id: 'A', text: "can't" }, { id: 'B', text: "mustn't" }, { id: 'C', text: "shouldn't" }, { id: 'D', text: "needn't" }], correctAnswer: 'B' },
-  { id: 36, topic: 'modals', question: "___ you help me carry these bags?", options: [{ id: 'A', text: 'Must' }, { id: 'B', text: 'Will' }, { id: 'C', text: 'Could' }, { id: 'D', text: 'Should' }], correctAnswer: 'C' },
-  { id: 37, topic: 'modals', question: "It ___ rain tomorrow. I'm not sure.", options: [{ id: 'A', text: 'must' }, { id: 'B', text: 'should' }, { id: 'C', text: 'can' }, { id: 'D', text: 'might' }], correctAnswer: 'D' },
-  { id: 38, topic: 'modals', question: "You look tired. You ___ go to bed early.", options: [{ id: 'A', text: 'must' }, { id: 'B', text: 'can' }, { id: 'C', text: 'should' }, { id: 'D', text: 'might' }], correctAnswer: 'C' },
-  { id: 39, topic: 'modals', question: "She ___ be at home. Her car is outside.", options: [{ id: 'A', text: 'should' }, { id: 'B', text: 'must' }, { id: 'C', text: 'might' }, { id: 'D', text: 'can' }], correctAnswer: 'B' },
-  { id: 40, topic: 'modals', question: "___ you please turn down the music?", options: [{ id: 'A', text: 'Must' }, { id: 'B', text: 'Would' }, { id: 'C', text: 'Should' }, { id: 'D', text: 'Can' }], correctAnswer: 'B' },
-
-  // ── CONDITIONALS (10) ──
-  { id: 41, topic: 'conditionals', question: "If it ___, we will stay indoors.", options: [{ id: 'A', text: 'rained' }, { id: 'B', text: 'rains' }, { id: 'C', text: 'rain' }, { id: 'D', text: 'raining' }], correctAnswer: 'B' },
-  { id: 42, topic: 'conditionals', question: "If I ___ rich, I would travel the world.", options: [{ id: 'A', text: 'am' }, { id: 'B', text: 'was' }, { id: 'C', text: 'were' }, { id: 'D', text: 'be' }], correctAnswer: 'C' },
-  { id: 43, topic: 'conditionals', question: "If she had studied, she ___ passed the exam.", options: [{ id: 'A', text: 'will have' }, { id: 'B', text: 'would' }, { id: 'C', text: 'would have' }, { id: 'D', text: 'had' }], correctAnswer: 'C' },
-  { id: 44, topic: 'conditionals', question: "If you heat water to 100°C, it ___.", options: [{ id: 'A', text: 'will boil' }, { id: 'B', text: 'boils' }, { id: 'C', text: 'would boil' }, { id: 'D', text: 'boiled' }], correctAnswer: 'B' },
-  { id: 45, topic: 'conditionals', question: "She ___ happy if you called her.", options: [{ id: 'A', text: 'is' }, { id: 'B', text: 'was' }, { id: 'C', text: 'will be' }, { id: 'D', text: 'would be' }], correctAnswer: 'D' },
-  { id: 46, topic: 'conditionals', question: "If he ___ harder, he would have succeeded.", options: [{ id: 'A', text: 'worked' }, { id: 'B', text: 'had worked' }, { id: 'C', text: 'works' }, { id: 'D', text: 'will work' }], correctAnswer: 'B' },
-  { id: 47, topic: 'conditionals', question: "If I ___ you, I would take the job.", options: [{ id: 'A', text: 'am' }, { id: 'B', text: 'was' }, { id: 'C', text: 'were' }, { id: 'D', text: 'be' }], correctAnswer: 'C' },
-  { id: 48, topic: 'conditionals', question: "If you ___ early, you won't miss the train.", options: [{ id: 'A', text: 'leave' }, { id: 'B', text: 'left' }, { id: 'C', text: 'had left' }, { id: 'D', text: 'will leave' }], correctAnswer: 'A' },
-  { id: 49, topic: 'conditionals', question: "I would have called you if I ___ your number.", options: [{ id: 'A', text: 'know' }, { id: 'B', text: 'knew' }, { id: 'C', text: 'had known' }, { id: 'D', text: 'will know' }], correctAnswer: 'C' },
-  { id: 50, topic: 'conditionals', question: "Water freezes if the temperature ___ below 0°C.", options: [{ id: 'A', text: 'falls' }, { id: 'B', text: 'fell' }, { id: 'C', text: 'would fall' }, { id: 'D', text: 'will fall' }], correctAnswer: 'A' },
-
-  // ── PASSIVE VOICE (10) ──
-  { id: 51, topic: 'passive', question: "The cake ___ by my mother.", options: [{ id: 'A', text: 'baked' }, { id: 'B', text: 'was baked' }, { id: 'C', text: 'is baking' }, { id: 'D', text: 'bakes' }], correctAnswer: 'B' },
-  { id: 52, topic: 'passive', question: "The letter ___ yesterday.", options: [{ id: 'A', text: 'has sent' }, { id: 'B', text: 'is sent' }, { id: 'C', text: 'was sent' }, { id: 'D', text: 'sends' }], correctAnswer: 'C' },
-  { id: 53, topic: 'passive', question: "A new hospital ___ in our city now.", options: [{ id: 'A', text: 'is built' }, { id: 'B', text: 'is being built' }, { id: 'C', text: 'has built' }, { id: 'D', text: 'was built' }], correctAnswer: 'B' },
-  { id: 54, topic: 'passive', question: "English ___ all over the world.", options: [{ id: 'A', text: 'speaks' }, { id: 'B', text: 'is speaking' }, { id: 'C', text: 'is spoken' }, { id: 'D', text: 'spoke' }], correctAnswer: 'C' },
-  { id: 55, topic: 'passive', question: "The windows ___ every Saturday.", options: [{ id: 'A', text: 'cleans' }, { id: 'B', text: 'cleaned' }, { id: 'C', text: 'are cleaned' }, { id: 'D', text: 'are cleaning' }], correctAnswer: 'C' },
-  { id: 56, topic: 'passive', question: "The thief ___ by the police last night.", options: [{ id: 'A', text: 'caught' }, { id: 'B', text: 'was caught' }, { id: 'C', text: 'is caught' }, { id: 'D', text: 'has caught' }], correctAnswer: 'B' },
-  { id: 57, topic: 'passive', question: "This novel ___ by Tolstoy in the 19th century.", options: [{ id: 'A', text: 'wrote' }, { id: 'B', text: 'was written' }, { id: 'C', text: 'has been written' }, { id: 'D', text: 'is writing' }], correctAnswer: 'B' },
-  { id: 58, topic: 'passive', question: "The project ___ by Friday.", options: [{ id: 'A', text: 'will finish' }, { id: 'B', text: 'will be finished' }, { id: 'C', text: 'is finishing' }, { id: 'D', text: 'has finished' }], correctAnswer: 'B' },
-  { id: 59, topic: 'passive', question: "A new school ___ in our neighborhood recently.", options: [{ id: 'A', text: 'built' }, { id: 'B', text: 'has built' }, { id: 'C', text: 'has been built' }, { id: 'D', text: 'is building' }], correctAnswer: 'C' },
-  { id: 60, topic: 'passive', question: "The documents ___ before I could read them.", options: [{ id: 'A', text: 'destroyed' }, { id: 'B', text: 'had been destroyed' }, { id: 'C', text: 'were destroying' }, { id: 'D', text: 'have destroyed' }], correctAnswer: 'B' },
-
-  // ── RELATIVE CLAUSES (10) ──
-  { id: 61, topic: 'relative', question: "The man ___ called you is my uncle.", options: [{ id: 'A', text: 'which' }, { id: 'B', text: 'who' }, { id: 'C', text: 'where' }, { id: 'D', text: 'when' }], correctAnswer: 'B' },
-  { id: 62, topic: 'relative', question: "This is the house ___ I grew up.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'which' }, { id: 'C', text: 'where' }, { id: 'D', text: 'that' }], correctAnswer: 'C' },
-  { id: 63, topic: 'relative', question: "The book ___ I bought is very interesting.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'where' }, { id: 'C', text: 'when' }, { id: 'D', text: 'which' }], correctAnswer: 'D' },
-  { id: 64, topic: 'relative', question: "I remember the day ___ we first met.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'which' }, { id: 'C', text: 'when' }, { id: 'D', text: 'where' }], correctAnswer: 'C' },
-  { id: 65, topic: 'relative', question: "The girl ___ bag was stolen called the police.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'whom' }, { id: 'C', text: 'whose' }, { id: 'D', text: 'which' }], correctAnswer: 'C' },
-  { id: 66, topic: 'relative', question: "The car ___ I drive is very old.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'whose' }, { id: 'C', text: 'where' }, { id: 'D', text: 'that' }], correctAnswer: 'D' },
-  { id: 67, topic: 'relative', question: "Is there a bank ___ I can exchange money?", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'which' }, { id: 'C', text: 'where' }, { id: 'D', text: 'when' }], correctAnswer: 'C' },
-  { id: 68, topic: 'relative', question: "The reason ___ she left is still unknown.", options: [{ id: 'A', text: 'when' }, { id: 'B', text: 'why' }, { id: 'C', text: 'which' }, { id: 'D', text: 'that' }], correctAnswer: 'B' },
-  { id: 69, topic: 'relative', question: "She is the doctor ___ saved my life.", options: [{ id: 'A', text: 'which' }, { id: 'B', text: 'whose' }, { id: 'C', text: 'who' }, { id: 'D', text: 'where' }], correctAnswer: 'C' },
-  { id: 70, topic: 'relative', question: "This is the city ___ I love most.", options: [{ id: 'A', text: 'who' }, { id: 'B', text: 'where' }, { id: 'C', text: 'when' }, { id: 'D', text: 'that' }], correctAnswer: 'D' },
-];
+const allQuestions: Question[] = quizQuestionsData as Question[];
 
 export default function QuizScreen() {
   const [phase, setPhase] = useState<QuizPhase>('topics');
